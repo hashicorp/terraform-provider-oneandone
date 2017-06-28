@@ -472,6 +472,29 @@ func resourceOneandOneServerUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
+	hw := &oneandone.Hardware{}
+
+	if d.HasChange("vcores") {
+		hw.Vcores = d.Get("vcores").(int)
+	}
+
+	if d.HasChange("cores_per_processor") {
+		hw.CoresPerProcessor = d.Get("cores_per_processor").(int)
+	}
+	if d.HasChange("ram") {
+		hw.Ram = float32(d.Get("ram").(float64))
+	}
+
+	if hw != nil && (hw.CoresPerProcessor > 0 || hw.Vcores > 0 || hw.Ram > 0) {
+		log.Println("[DEBUG] HARWARE IS", hw)
+		srv, err := config.API.UpdateServerHardware(d.Id(), hw)
+		if err != nil {
+			return err
+		}
+
+		err = config.API.WaitForState(srv, "POWERED_ON", 30, config.Retries)
+	}
+
 	return resourceOneandOneServerRead(d, meta)
 }
 
