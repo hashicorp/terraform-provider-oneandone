@@ -486,7 +486,6 @@ func resourceOneandOneServerUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if hw != nil && (hw.CoresPerProcessor > 0 || hw.Vcores > 0 || hw.Ram > 0) {
-		log.Println("[DEBUG] HARWARE IS", hw)
 		srv, err := config.API.UpdateServerHardware(d.Id(), hw)
 		if err != nil {
 			return err
