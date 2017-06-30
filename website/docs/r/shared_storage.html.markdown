@@ -35,6 +35,7 @@ resource "oneandone_shared_storage" "storage" {
 
 The following arguments are supported:
 
+* `name` - (Required) The name of the storage
 * `datacenter` - (Optional) Location of desired 1and1 datacenter. Can be `DE`, `GB`, `US` or `ES`
 * `description` - (Optional) Description for the shared storage
 * `size` - (Required) Size of the shared storage

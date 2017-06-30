@@ -58,3 +58,9 @@ The following arguments are supported:
 * `ram` -(Required) Size of ram.
 * `ssh_key_path` - (Optional) Path to private ssh key
 * `vcores` -(Required) Number of virtual cores.
+
+IPs (`ips`) expose the following attributes
+
+* `id` - (Computed) The ID of the attached IP
+* `ip` - (Computed) The IP 
+* `firewall_policy_id` - (Computed) The attached firewall policy
