@@ -52,6 +52,7 @@ func resourceOneandOneServer() *schema.Resource {
 			"password": {
 				Type:      schema.TypeString,
 				Optional:  true,
+				Computed:  true,
 				Sensitive: true,
 			},
 			"datacenter": {
