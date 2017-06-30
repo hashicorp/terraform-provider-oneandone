@@ -13,10 +13,10 @@ Manages a VPN on 1&1
 ## Example Usage
 
 ```hcl
-resource "oneandone_public_ip" "ip" {
-  "ip_type" = "IPV4"
-  "reverse_dns" = "test.1and1.com"
-  "datacenter" = "GB"
+resource "oneandone_vpn" "vpn" {
+  datacenter  = "GB"
+  name        = "%s"
+  description = "ttest descr"
 }
 ```
 
@@ -25,6 +25,8 @@ resource "oneandone_public_ip" "ip" {
 The following arguments are supported:
 
 * `datacenter` - (Optional) Location of desired 1and1 datacenter. Can be `DE`, `GB`, `US` or `ES`.
-* `ip_type` - (Required) IPV4 or IPV6
-* `reverese_dns` - (Optional)
+* `name` - (Required) The name of the VPN
+* `description` - (Optional)
+* `download_path` - (Optional)
+* `file_name` - (Optional)
 
