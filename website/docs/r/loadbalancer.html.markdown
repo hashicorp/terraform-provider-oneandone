@@ -49,9 +49,9 @@ The following arguments are supported:
 * `persistence` - (Optional) True/false defines whether persistence should be turned on/off
 * `persistence_time` - (Optional) Persistence duration in seconds
 * `health_check_test` - (Optional) Can be `TCP` or`ICMP`.
-* `health_check_test_interval` - (Optional) 
-* `health_check_test_path` - (Optional) 
-* `health_check_test_parser` - (Optional) 
+* `health_check_interval` - (Optional)
+* `health_check_path` - (Optional)
+* `health_check_path_parser` - (Optional)
 
 Loadbalancer rules (`rules`) support the following
 

@@ -123,7 +123,7 @@ The following arguments are supported:
 * `name` - (Required) The name of the VPN.
 * `description` - (Optional) Description for the VPN
 * `email` - (Optional)  Email address to which notifications monitoring system will send
-* `agent- (Required) Indicates which monitoring type will be used. True: To use this monitoring type, you must install an agent on the server.  False: Monitor a server without installing an agent. Note: If you do not install an agent, you cannot retrieve information such as free hard disk space or ongoing processes.
+* `agent` (Required) Indicates which monitoring type will be used. True: To use this monitoring type, you must install an agent on the server.  False: Monitor a server without installing an agent. Note: If you do not install an agent, you cannot retrieve information such as free hard disk space or ongoing processes.
 
 Monitoring Policy Thresholds (`thresholds`) support the following:
 
@@ -165,13 +165,13 @@ Monitoring Policy Thresholds (`thresholds`) support the following:
 
 Monitoring Policy Ports (`ports`) support the following:
 
-* `email_notification - (Required) If set true email will be sent.
-* `port - (Required) Port number.
+* `email_notification` - (Required) If set true email will be sent.
+* `port` - (Required) Port number.
 * `protocol` - (Required) The protocol of the port. Allowed values are `TCP`, `UDP`, `TCP/UDP`, `ICMP` and `IPSEC`.
-* `alert_if - (Required) Condition for the alert to be issued.
+* `alert_if` - (Required) Condition for the alert to be issued.
 
 Monitoring Policy Ports (`processes`) support the following:
 
-* `email_notification - (Required) If set true email will be sent.
-* `process - (Required) Process name.
-* `alert_if - (Required) Condition for the alert to be issued.
+* `email_notification` - (Required) If set true email will be sent.
+* `process` - (Required) Process name.
+* `alert_if` - (Required) Condition for the alert to be issued.
