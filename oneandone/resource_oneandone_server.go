@@ -33,7 +33,7 @@ func resourceOneandOneServer() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"fixedsize": {
+			"fixed_instance_size": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"vcores", "ram", "cores_per_processor", "hdds"},
@@ -172,8 +172,8 @@ func resourceOneandOneServerCreate(d *schema.ResourceData, meta interface{}) err
 		PowerOn:     true,
 	}
 
-	if fixedsize := d.Get("fixedsize").(string); fixedsize != "" {
-		FixedInsSizeId, err := fixedsize2Id(config, fixedsize)
+	if fixed_instance_size := d.Get("fixed_instance_size").(string); fixed_instance_size != "" {
+		FixedInsSizeId, err := fixedsize2Id(config, fixed_instance_size)
 		if err != nil {
 			return err
 		}
@@ -300,11 +300,11 @@ func resourceOneandOneServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("datacenter", server.Datacenter.CountryCode)
 
 	if server.Hardware.FixedInsSizeId != "" {
-		fixedsize, err := Id2fixedsize(config, server.Hardware.FixedInsSizeId)
+		fixed_instance_size, err := Id2fixedsize(config, server.Hardware.FixedInsSizeId)
 		if err != nil {
 			return err
 		}
-		d.Set("fixedsize", fixedsize)
+		d.Set("fixed_instance_size", fixed_instance_size)
 	} else {
 		d.Set("hdds", readHdds(server.Hardware))
 	}
@@ -333,12 +333,12 @@ func resourceOneandOneServerUpdate(d *schema.ResourceData, meta interface{}) err
 
 	}
 
-	var fixedsize string
-	if tmp := d.Get("fixedsize").(string); tmp != "" {
-		fixedsize = tmp
+	var fixed_instance_size string
+	if tmp := d.Get("fixed_instance_size").(string); tmp != "" {
+		fixed_instance_size = tmp
 	}
 
-	if d.HasChange("hdds") && fixedsize == "" {
+	if d.HasChange("hdds") && fixed_instance_size == "" {
 		oldV, newV := d.GetChange("hdds")
 		newValues := newV.([]interface{})
 		oldValues := oldV.([]interface{})
@@ -503,9 +503,9 @@ func resourceOneandOneServerUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	var FixedInsSizeId string
-	if d.HasChange("fixedsize") {
+	if d.HasChange("fixed_instance_size") {
 		var err error
-		FixedInsSizeId, err = fixedsize2Id(config, fixedsize)
+		FixedInsSizeId, err = fixedsize2Id(config, fixed_instance_size)
 		if err != nil {
 			return err
 		}
@@ -589,26 +589,26 @@ func readIps(ips []oneandone.ServerIp) []map[string]interface{} {
 	return raw
 }
 
-func fixedsize2Id(config *Config, fixedsize string) (string, error) {
-	fixedsizes, err := config.API.ListFixedInstanceSizes()
+func fixedsize2Id(config *Config, fixed_instance_size string) (string, error) {
+	fixed_instance_sizes, err := config.API.ListFixedInstanceSizes()
 	if err != nil {
 		return "", fmt.Errorf("Could not fetch FixedInstanceSizes: %s ", err)
 	}
-	fixedsize = strings.ToLower(fixedsize)
-	for _, size := range fixedsizes {
-		if strings.ToLower(size.Name) == fixedsize {
+	fixed_instance_size = strings.ToLower(fixed_instance_size)
+	for _, size := range fixed_instance_sizes {
+		if strings.ToLower(size.Name) == fixed_instance_size {
 			return size.Id, nil
 		}
 	}
-	return "", fmt.Errorf("FixedInstanceName not found: %s ", fixedsize)
+	return "", fmt.Errorf("FixedInstanceName not found: %s ", fixed_instance_size)
 }
 
 func Id2fixedsize(config *Config, id string) (string, error) {
-	fixedsizes, err := config.API.ListFixedInstanceSizes()
+	fixed_instance_sizes, err := config.API.ListFixedInstanceSizes()
 	if err != nil {
 		return "", fmt.Errorf("Could not fetch FixedInstanceSizes: %s ", err)
 	}
-	for _, size := range fixedsizes {
+	for _, size := range fixed_instance_sizes {
 		if size.Id == id {
 			return size.Name, nil
 		}
