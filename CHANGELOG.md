@@ -1,4 +1,9 @@
 ## 0.1.1 (Unreleased)
+
+BUG FIXES:
+
+* resource/resource_oneandone_server.go: Added missing update hardware function [GH-2]
+
 ## 0.1.0 (June 21, 2017)
 
 NOTES:
