@@ -32,7 +32,7 @@ $ make build
 
 Using the provider
 ----------------------
-## Fill in for each provider
+See the [1&1 Provider documentation](https://www.terraform.io/docs/providers/oneandone/index.html) to get started using the 1&1 provider.
 
 Developing the Provider
 ---------------------------

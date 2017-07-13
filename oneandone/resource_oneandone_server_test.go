@@ -52,6 +52,48 @@ func TestAccOneandoneServer_Basic(t *testing.T) {
 	})
 }
 
+func TestAccOneandoneServer_Hardware(t *testing.T) {
+	var server oneandone.Server
+
+	name := "test_server_hardware"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDOneandoneServerDestroyCheck,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: fmt.Sprintf(testAccCheckOneandoneServer_basic, name, name),
+				Check: resource.ComposeTestCheckFunc(
+					func(*terraform.State) error {
+						time.Sleep(10 * time.Second)
+						return nil
+					},
+					testAccCheckOneandoneServerExists("oneandone_server.server", &server),
+					resource.TestCheckResourceAttr("oneandone_server.server", "vcores", "1"),
+					resource.TestCheckResourceAttr("oneandone_server.server", "ram", "2"),
+					resource.TestCheckResourceAttr("oneandone_server.server", "name", name),
+				),
+			},
+			resource.TestStep{
+				Config: fmt.Sprintf(testAccCheckOneandoneServer_hardware, name, name),
+				Check: resource.ComposeTestCheckFunc(
+					func(*terraform.State) error {
+						time.Sleep(10 * time.Second)
+						return nil
+					},
+					testAccCheckOneandoneServerExists("oneandone_server.server", &server),
+					resource.TestCheckResourceAttr("oneandone_server.server", "vcores", "2"),
+					resource.TestCheckResourceAttr("oneandone_server.server", "ram", "2.5"),
+					resource.TestCheckResourceAttr("oneandone_server.server", "name", name),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckDOneandoneServerDestroyCheck(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "oneandone_server" {
@@ -120,6 +162,24 @@ resource "oneandone_server" "server" {
   vcores = 1
   cores_per_processor = 1
   ram = 2
+  password = "Kv40kd8PQb"
+  hdds = [
+    {
+      disk_size = 20
+      is_main = true
+    }
+  ]
+}`
+
+const testAccCheckOneandoneServer_hardware = `
+resource "oneandone_server" "server" {
+  name = "%s"
+  description = "%s"
+  image = "ubuntu"
+  datacenter = "GB"
+  vcores = 2
+  cores_per_processor = 1
+  ram = 2.5
   password = "Kv40kd8PQb"
   hdds = [
     {
