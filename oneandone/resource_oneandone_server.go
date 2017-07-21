@@ -36,6 +36,7 @@ func resourceOneandOneServer() *schema.Resource {
 			"fixed_instance_size": {
 				Type:          schema.TypeString,
 				Optional:      true,
+				ForceNew:      true,
 				ConflictsWith: []string{"vcores", "ram", "cores_per_processor", "hdds"},
 			},
 			"vcores": {
@@ -173,12 +174,8 @@ func resourceOneandOneServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if fixed_instance_size := d.Get("fixed_instance_size").(string); fixed_instance_size != "" {
-		FixedInsSizeId, err := fixedsize2Id(config, fixed_instance_size)
-		if err != nil {
-			return err
-		}
 		req.Hardware = oneandone.Hardware{
-			FixedInsSizeId: FixedInsSizeId,
+			FixedInsSizeId: fixed_instance_size,
 		}
 	} else {
 		req.Hardware = oneandone.Hardware{
@@ -300,11 +297,7 @@ func resourceOneandOneServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("datacenter", server.Datacenter.CountryCode)
 
 	if server.Hardware.FixedInsSizeId != "" {
-		fixed_instance_size, err := Id2fixedsize(config, server.Hardware.FixedInsSizeId)
-		if err != nil {
-			return err
-		}
-		d.Set("fixed_instance_size", fixed_instance_size)
+		d.Set("fixed_instance_size", server.Hardware.FixedInsSizeId)
 	} else {
 		d.Set("hdds", readHdds(server.Hardware))
 	}
@@ -361,7 +354,6 @@ func resourceOneandOneServerUpdate(d *schema.ResourceData, meta interface{}) err
 		} else {
 			for _, newHdd := range newValues {
 				n := newHdd.(map[string]interface{})
-				//old := oldHdd.(map[string]interface{})
 
 				if n["id"].(string) == "" {
 					hdds := oneandone.ServerHdds{
@@ -504,11 +496,7 @@ func resourceOneandOneServerUpdate(d *schema.ResourceData, meta interface{}) err
 
 	var FixedInsSizeId string
 	if d.HasChange("fixed_instance_size") {
-		var err error
-		FixedInsSizeId, err = fixedsize2Id(config, fixed_instance_size)
-		if err != nil {
-			return err
-		}
+		FixedInsSizeId = fixed_instance_size
 	}
 
 	hw := &oneandone.Hardware{}
@@ -587,33 +575,6 @@ func readIps(ips []oneandone.ServerIp) []map[string]interface{} {
 	}
 
 	return raw
-}
-
-func fixedsize2Id(config *Config, fixed_instance_size string) (string, error) {
-	fixed_instance_sizes, err := config.API.ListFixedInstanceSizes()
-	if err != nil {
-		return "", fmt.Errorf("Could not fetch FixedInstanceSizes: %s ", err)
-	}
-	fixed_instance_size = strings.ToLower(fixed_instance_size)
-	for _, size := range fixed_instance_sizes {
-		if strings.ToLower(size.Name) == fixed_instance_size {
-			return size.Id, nil
-		}
-	}
-	return "", fmt.Errorf("FixedInstanceName not found: %s ", fixed_instance_size)
-}
-
-func Id2fixedsize(config *Config, id string) (string, error) {
-	fixed_instance_sizes, err := config.API.ListFixedInstanceSizes()
-	if err != nil {
-		return "", fmt.Errorf("Could not fetch FixedInstanceSizes: %s ", err)
-	}
-	for _, size := range fixed_instance_sizes {
-		if size.Id == id {
-			return size.Name, nil
-		}
-	}
-	return "", fmt.Errorf("FixedInstanceId not found: %s ", id)
 }
 
 func getSshKey(path string) (privatekey string, publickey string, err error) {
