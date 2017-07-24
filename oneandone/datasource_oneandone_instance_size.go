@@ -2,7 +2,6 @@ package oneandone
 
 import (
 	"errors"
-	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -46,7 +45,6 @@ func dataSourceOneandOneFixedInstanceSizesRead(d *schema.ResourceData, meta inte
 
 	found := false
 	for _, size := range fixed_instance_sizes {
-		log.Print("SIZE: ", size, " ", size.Hardware)
 		if name != "" && size.Name != name {
 			continue
 		}
