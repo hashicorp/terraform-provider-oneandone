@@ -9,20 +9,28 @@ import (
 )
 
 func TestAccDataSourceOneandOneServerSize(t *testing.T) {
-	sizeName := "XL"
-	sizeId := "F94E3B12D06231D9CDA1859E09133D8A"
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccDataSourceOneandOneServerSizeConfig(sizeName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccDataSourceOneandOneServerSize("data.oneandone_instance_size.serversize", sizeName, sizeId),
-				),
-			},
+			testAccDataSourceOneandOneServerStep(
+				`name = "XL"`,
+				"XL", "F94E3B12D06231D9CDA1859E09133D8A"),
+			testAccDataSourceOneandOneServerStep(
+				`vcores = 4
+				ram = 8`,
+				"XXL", "2E4092AAB9D31CBA368B05AC70ABEC5A"),
 		},
 	})
+}
+
+func testAccDataSourceOneandOneServerStep(filter string, name string, id string) resource.TestStep {
+	return resource.TestStep{
+		Config: testAccDataSourceOneandOneServerSizeConfig(filter),
+		Check: resource.ComposeTestCheckFunc(
+			testAccDataSourceOneandOneServerSize("data.oneandone_instance_size.serversize", name, id),
+		),
+	}
 }
 
 func testAccDataSourceOneandOneServerSize(data_source_name string, sizeName string, sizeId string) resource.TestCheckFunc {
@@ -35,10 +43,10 @@ func testAccDataSourceOneandOneServerSize(data_source_name string, sizeName stri
 		ds_attr := ds.Primary.Attributes
 
 		if ds_attr["name"] != sizeName {
-			return fmt.Errorf("name is not %s", sizeName)
+			return fmt.Errorf("name is %s instead of %s", ds_attr["name"], sizeName)
 		}
 		if ds_attr["id"] != sizeId {
-			return fmt.Errorf("id of %s is not %s", sizeName, sizeId)
+			return fmt.Errorf("id of %s is %s instead of %s", sizeName, ds_attr["id"], sizeId)
 		}
 		return nil
 	}
@@ -47,6 +55,6 @@ func testAccDataSourceOneandOneServerSize(data_source_name string, sizeName stri
 func testAccDataSourceOneandOneServerSizeConfig(name string) string {
 	return fmt.Sprintf(`
 data "oneandone_instance_size" "serversize" {
-	name = "%s"
+	%s
 }`, name)
 }
