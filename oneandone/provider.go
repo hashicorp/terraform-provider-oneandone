@@ -39,6 +39,9 @@ func Provider() terraform.ResourceProvider {
 			"oneandone_vpn":               resourceOneandOneVPN(),
 		},
 		ConfigureFunc: providerConfigure,
+		DataSourcesMap: map[string]*schema.Resource{
+			"oneandone_instance_size": dataSourceOneandOneServerSize(),
+		},
 	}
 }
 

@@ -3,15 +3,15 @@ package oneandone
 import (
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
 	"fmt"
-	"github.com/1and1/oneandone-cloudserver-sdk-go"
-	"github.com/hashicorp/terraform/helper/schema"
-	"golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"log"
 	"strings"
 
-	"errors"
+	"github.com/1and1/oneandone-cloudserver-sdk-go"
+	"github.com/hashicorp/terraform/helper/schema"
+	"golang.org/x/crypto/ssh"
 )
 
 func resourceOneandOneServer() *schema.Resource {
@@ -33,17 +33,23 @@ func resourceOneandOneServer() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"fixed_instance_size": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				ForceNew:      true,
+				ConflictsWith: []string{"vcores", "ram", "cores_per_processor", "hdds"},
+			},
 			"vcores": {
 				Type:     schema.TypeInt,
-				Required: true,
+				Optional: true,
 			},
 			"cores_per_processor": {
 				Type:     schema.TypeInt,
-				Required: true,
+				Optional: true,
 			},
 			"ram": {
 				Type:     schema.TypeFloat,
-				Required: true,
+				Optional: true,
 			},
 			"ssh_key_path": {
 				Type:     schema.TypeString,
@@ -101,7 +107,7 @@ func resourceOneandOneServer() *schema.Resource {
 						},
 					},
 				},
-				Required: true,
+				Optional: true,
 			},
 			"firewall_policy_id": {
 				Type:     schema.TypeString,
@@ -165,12 +171,19 @@ func resourceOneandOneServerCreate(d *schema.ResourceData, meta interface{}) err
 		Description: d.Get("description").(string),
 		ApplianceId: sa.Id,
 		PowerOn:     true,
-		Hardware: oneandone.Hardware{
+	}
+
+	if fixed_instance_size := d.Get("fixed_instance_size").(string); fixed_instance_size != "" {
+		req.Hardware = oneandone.Hardware{
+			FixedInsSizeId: fixed_instance_size,
+		}
+	} else {
+		req.Hardware = oneandone.Hardware{
 			Vcores:            d.Get("vcores").(int),
 			CoresPerProcessor: d.Get("cores_per_processor").(int),
 			Ram:               float32(d.Get("ram").(float64)),
 			Hdds:              hdds,
-		},
+		}
 	}
 
 	if raw, ok := d.GetOk("ip"); ok {
@@ -283,7 +296,11 @@ func resourceOneandOneServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("name", server.Name)
 	d.Set("datacenter", server.Datacenter.CountryCode)
 
-	d.Set("hdds", readHdds(server.Hardware))
+	if server.Hardware.FixedInsSizeId != "" {
+		d.Set("fixed_instance_size", server.Hardware.FixedInsSizeId)
+	} else {
+		d.Set("hdds", readHdds(server.Hardware))
+	}
 
 	d.Set("ips", readIps(server.Ips))
 
@@ -309,7 +326,12 @@ func resourceOneandOneServerUpdate(d *schema.ResourceData, meta interface{}) err
 
 	}
 
-	if d.HasChange("hdds") {
+	var fixed_instance_size string
+	if tmp := d.Get("fixed_instance_size").(string); tmp != "" {
+		fixed_instance_size = tmp
+	}
+
+	if d.HasChange("hdds") && fixed_instance_size == "" {
 		oldV, newV := d.GetChange("hdds")
 		newValues := newV.([]interface{})
 		oldValues := oldV.([]interface{})
@@ -332,7 +354,6 @@ func resourceOneandOneServerUpdate(d *schema.ResourceData, meta interface{}) err
 		} else {
 			for _, newHdd := range newValues {
 				n := newHdd.(map[string]interface{})
-				//old := oldHdd.(map[string]interface{})
 
 				if n["id"].(string) == "" {
 					hdds := oneandone.ServerHdds{
@@ -473,25 +494,32 @@ func resourceOneandOneServerUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
+	var FixedInsSizeId string
+	if d.HasChange("fixed_instance_size") {
+		FixedInsSizeId = fixed_instance_size
+	}
+
 	hw := &oneandone.Hardware{}
 
-	if d.HasChange("vcores") {
-		hw.Vcores = d.Get("vcores").(int)
-	}
+	if FixedInsSizeId != "" {
+		hw.FixedInsSizeId = FixedInsSizeId
+	} else {
+		if d.HasChange("vcores") {
+			hw.Vcores = d.Get("vcores").(int)
+		}
 
-	if d.HasChange("cores_per_processor") {
-		hw.CoresPerProcessor = d.Get("cores_per_processor").(int)
+		if d.HasChange("cores_per_processor") {
+			hw.CoresPerProcessor = d.Get("cores_per_processor").(int)
+		}
+		if d.HasChange("ram") {
+			hw.Ram = float32(d.Get("ram").(float64))
+		}
 	}
-	if d.HasChange("ram") {
-		hw.Ram = float32(d.Get("ram").(float64))
-	}
-
-	if hw != nil && (hw.CoresPerProcessor > 0 || hw.Vcores > 0 || hw.Ram > 0) {
+	if hw != nil && (hw.CoresPerProcessor > 0 || hw.Vcores > 0 || hw.Ram > 0 || hw.FixedInsSizeId != "") {
 		srv, err := config.API.UpdateServerHardware(d.Id(), hw)
 		if err != nil {
 			return err
 		}
-
 		err = config.API.WaitForState(srv, "POWERED_ON", 30, config.Retries)
 	}
 

@@ -2,13 +2,14 @@ package oneandone
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"testing"
+	"time"
 
 	"github.com/1and1/oneandone-cloudserver-sdk-go"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"os"
-	"time"
 )
 
 func TestAccOneandoneServer_Basic(t *testing.T) {
@@ -139,16 +140,24 @@ func testAccCheckOneandoneServerExists(n string, server *oneandone.Server) resou
 
 		api := oneandone.New(os.Getenv("ONEANDONE_TOKEN"), oneandone.BaseUrl)
 
-		found_server, err := api.GetServer(rs.Primary.ID)
+		updating := true
+		for updating {
+			found_server, err := api.GetServer(rs.Primary.ID)
 
-		if err != nil {
-			return fmt.Errorf("Error occured while fetching Server: %s", rs.Primary.ID)
+			if err != nil {
+				return fmt.Errorf("Error occured while fetching Server: %s", rs.Primary.ID)
+			}
+			if found_server.Id != rs.Primary.ID {
+				return fmt.Errorf("Record not found")
+			}
+			if found_server.Status.Percent == 0 {
+				updating = false
+				server = found_server
+			} else {
+				log.Print("waiting:", found_server.Status.Percent)
+				time.Sleep(time.Second)
+			}
 		}
-		if found_server.Id != rs.Primary.ID {
-			return fmt.Errorf("Record not found")
-		}
-		server = found_server
-
 		return nil
 	}
 }
