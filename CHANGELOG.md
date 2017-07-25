@@ -1,8 +1,18 @@
 ## 0.1.1 (Unreleased)
 
+FEATURES:
+
+* **New Data Source:** `oneandone_instance_size` (#4)[https://github.com/terraform-providers/terraform-provider-oneandone/issues/4]
+
+IMPROVEMENTS: 
+
+* `oneandone_server` - added `fixed_instance_size` parameter [GH-5]
+
 BUG FIXES:
 
 * resource/resource_oneandone_server.go: Added missing update hardware function [GH-2]
+
+
 
 ## 0.1.0 (June 21, 2017)
 
