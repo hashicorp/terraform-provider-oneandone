@@ -42,11 +42,12 @@ resource "oneandone_server" "server" {
 
 The following arguments are supported:
 
-* `cores_per_processor` -(Required) Number of cores per processor
+* `cores_per_processor` -(Optional) Number of cores per processor
 * `datacenter` - (Optional) Location of desired 1and1 datacenter. Can be `DE`, `GB`, `US` or `ES`
 * `description` - (Optional) Description of the server
 * `firewall_policy_id` - (Optional) ID of firewall policy
-* `hdds` - (Required) List of HDDs. One HDD must be main.
+* `fixed_instance_size` - (Optional) ID of a fixed instance size
+* `hdds` - (Optional) List of HDDs. One HDD must be main.
 * `*disk_size` -(Required) The size of HDD
 * `*is_main` - (Optional) Indicates if HDD is to be used as main hard disk of the server
 * `image` -(Required) The name of a desired image to be provisioned with the server
@@ -55,9 +56,11 @@ The following arguments are supported:
 * `monitoring_policy_id` - (Optional) ID of monitoring policy
 * `name` -(Required) The name of the server.
 * `password` - (Optional) Desired password.
-* `ram` -(Required) Size of ram.
+* `ram` -(Optional) Size of ram.
 * `ssh_key_path` - (Optional) Path to private ssh key
-* `vcores` -(Required) Number of virtual cores.
+* `vcores` -(Optional) Number of virtual cores.
+
+Either `fixed_instance_size` or all of `vcores`, `cores_per_processor`, `ram` and `hdds` are required.
 
 IPs (`ips`) expose the following attributes
 
