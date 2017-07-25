@@ -15,25 +15,25 @@ func TestAccDataSourceOneandOneServerSize(t *testing.T) {
 		Steps: []resource.TestStep{
 			testAccDataSourceOneandOneServerStep(
 				`name = "XL"`,
-				"XL", "F94E3B12D06231D9CDA1859E09133D8A"),
+				"XL", 2, 4),
 			testAccDataSourceOneandOneServerStep(
 				`vcores = 4
 				ram = 8`,
-				"XXL", "2E4092AAB9D31CBA368B05AC70ABEC5A"),
+				"XXL", 4, 8),
 		},
 	})
 }
 
-func testAccDataSourceOneandOneServerStep(filter string, name string, id string) resource.TestStep {
+func testAccDataSourceOneandOneServerStep(filter string, name string, vcores int, ram int) resource.TestStep {
 	return resource.TestStep{
 		Config: testAccDataSourceOneandOneServerSizeConfig(filter),
 		Check: resource.ComposeTestCheckFunc(
-			testAccDataSourceOneandOneServerSize("data.oneandone_instance_size.serversize", name, id),
+			testAccDataSourceOneandOneServerSize("data.oneandone_instance_size.serversize", name, vcores, ram),
 		),
 	}
 }
 
-func testAccDataSourceOneandOneServerSize(data_source_name string, sizeName string, sizeId string) resource.TestCheckFunc {
+func testAccDataSourceOneandOneServerSize(data_source_name string, sizeName string, vcores int, ram int) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		ds, ok := s.RootModule().Resources[data_source_name]
 		if !ok {
@@ -42,11 +42,17 @@ func testAccDataSourceOneandOneServerSize(data_source_name string, sizeName stri
 
 		ds_attr := ds.Primary.Attributes
 
+		if len(ds_attr["id"]) < 32 {
+			return fmt.Errorf("id is %s(%d) which is too short", ds_attr["id"], len(ds_attr["id"]))
+		}
 		if ds_attr["name"] != sizeName {
 			return fmt.Errorf("name is %s instead of %s", ds_attr["name"], sizeName)
 		}
-		if ds_attr["id"] != sizeId {
-			return fmt.Errorf("id of %s is %s instead of %s", sizeName, ds_attr["id"], sizeId)
+		if ds_attr["vcores"] != fmt.Sprintf("%d", vcores) {
+			return fmt.Errorf("vcores of %s is %s instead of %d", sizeName, ds_attr["vcores"], vcores)
+		}
+		if ds_attr["ram"] != fmt.Sprintf("%d", ram) {
+			return fmt.Errorf("ram of %s is %s instead of %d", sizeName, ds_attr["ram"], ram)
 		}
 		return nil
 	}

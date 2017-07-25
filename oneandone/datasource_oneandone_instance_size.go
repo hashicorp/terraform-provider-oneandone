@@ -43,7 +43,6 @@ func dataSourceOneandOneFixedInstanceSizesRead(d *schema.ResourceData, meta inte
 		return errors.New("no FixedInstanceSizes selectors set")
 	}
 
-	found := false
 	for _, size := range fixed_instance_sizes {
 		if name != "" && size.Name != name {
 			continue
@@ -55,13 +54,12 @@ func dataSourceOneandOneFixedInstanceSizesRead(d *schema.ResourceData, meta inte
 			continue
 		}
 
-		found = true
 		d.SetId(size.Id)
 		d.Set("name", size.Name)
-		break
+		d.Set("vcores", size.Hardware.Vcores)
+		d.Set("ram", size.Hardware.Ram)
+		d.Set("coresPerProcessor", size.Hardware.CoresPerProcessor)
+		return nil
 	}
-	if !found {
-		return errors.New("size not found")
-	}
-	return nil
+	return errors.New("size not found")
 }
