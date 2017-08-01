@@ -54,6 +54,13 @@ func resourceOneandOneServer() *schema.Resource {
 			"ssh_key_path": {
 				Type:     schema.TypeString,
 				Optional: true,
+				ForceNew: true,
+			},
+			"ssh_key_public": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				ForceNew:      true,
+				ConflictsWith: []string{"ssh_key_path"},
 			},
 			"password": {
 				Type:      schema.TypeString,
@@ -246,6 +253,10 @@ func resourceOneandOneServerCreate(d *schema.ResourceData, meta interface{}) err
 		}
 
 		req.SSHKey = publicKey
+	}
+
+	if raw, ok := d.GetOk("ssh_key_public"); ok {
+		req.SSHKey = raw.(string)
 	}
 
 	var password string
