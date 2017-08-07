@@ -21,7 +21,8 @@ resource "oneandone_server" "server" {
   vcores = 1
   cores_per_processor = 1
   ram = 2
-  ssh_key_path = "/path/to/prvate/ssh_key"
+  ssh_key_path = "/path/to/private/ssh_key"
+  ssh_key_public = "${file("/path/to/public/key.pub")}"
   hdds = [
     {
       disk_size = 60
@@ -58,6 +59,7 @@ The following arguments are supported:
 * `password` - (Optional) Desired password.
 * `ram` -(Optional) Size of ram.
 * `ssh_key_path` - (Optional) Path to private ssh key
+* `ssh_key_public` - (Optional) The public key data in OpenSSH authorized_keys format.
 * `vcores` -(Optional) Number of virtual cores.
 
 Either `fixed_instance_size` or all of `vcores`, `cores_per_processor`, `ram` and `hdds` are required.
