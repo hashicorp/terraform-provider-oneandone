@@ -7,6 +7,7 @@ FEATURES:
 IMPROVEMENTS: 
 
 * `oneandone_server` - added `fixed_instance_size` parameter [GH-5]
+* `oneandone_server` - added `ssh_key_public` parameter [GH-6]
 
 BUG FIXES:
 
