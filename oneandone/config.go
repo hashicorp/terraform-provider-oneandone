@@ -1,7 +1,10 @@
 package oneandone
 
 import (
+	"net/http"
+
 	"github.com/1and1/oneandone-cloudserver-sdk-go"
+	"github.com/hashicorp/terraform/helper/logging"
 )
 
 type Config struct {
@@ -19,6 +22,8 @@ func (c *Config) Client() (*Config, error) {
 	} else {
 		c.API = oneandone.New(token, oneandone.BaseUrl)
 	}
+
+	c.API.Client.SetTransport(logging.NewTransport("One and One", http.DefaultTransport))
 
 	return c, nil
 }
