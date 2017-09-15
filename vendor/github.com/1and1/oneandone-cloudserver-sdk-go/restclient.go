@@ -13,13 +13,18 @@ import (
 )
 
 type restClient struct {
-	token string
+	token     string
+	transport http.RoundTripper
 }
 
 func newRestClient(token string) *restClient {
 	restClient := new(restClient)
 	restClient.token = token
 	return restClient
+}
+
+func (c *restClient) SetTransport(transport http.RoundTripper) {
+	c.transport = transport
 }
 
 func (c *restClient) Get(url string, result interface{}, expectedStatus int) error {
@@ -53,6 +58,11 @@ func (c *restClient) doRequest(url string, method string, requestBody interface{
 	request.Header.Add("X-Token", c.token)
 	request.Header.Add("Content-Type", "application/json")
 	client := http.Client{}
+
+	if c.transport != nil {
+		client.Transport = c.transport
+	}
+
 	response, err := client.Do(request)
 	if err = isError(response, expectedStatus, err); err != nil {
 		return err

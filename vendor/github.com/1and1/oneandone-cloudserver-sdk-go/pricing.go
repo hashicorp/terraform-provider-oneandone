@@ -21,10 +21,10 @@ type serverPricing struct {
 }
 
 type pricingItem struct {
-	Name       string `json:"name,omitempty"`
-	GrossPrice string `json:"price_gross,omitempty"`
-	NetPrice   string `json:"price_net,omitempty"`
-	Unit       string `json:"unit,omitempty"`
+	Name       string  `json:"name,omitempty"`
+	GrossPrice float64 `json:"price_gross"`
+	NetPrice   float64 `json:"price_net"`
+	Unit       string  `json:"unit,omitempty"`
 }
 
 // GET /pricing
