@@ -8,6 +8,7 @@ IMPROVEMENTS:
 
 * `oneandone_server` - added `fixed_instance_size` parameter [GH-5]
 * `oneandone_server` - added `ssh_key_public` parameter [GH-6]
+* `provider` - Use logging transport in DEBUG mode [GH-10]
 
 BUG FIXES:
 
