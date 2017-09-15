@@ -17,6 +17,8 @@ func TestAccOneandoneServer_Basic(t *testing.T) {
 
 	name := "test_server"
 	name_updated := "test_server_renamed"
+	image := "centos6-64min"
+	updated_image := "centos7-64min"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -26,7 +28,7 @@ func TestAccOneandoneServer_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckDOneandoneServerDestroyCheck,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: fmt.Sprintf(testAccCheckOneandoneServer_basic, name, name),
+				Config: fmt.Sprintf(testAccCheckOneandoneServer_basic, name, name, image),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
 						time.Sleep(10 * time.Second)
@@ -38,7 +40,7 @@ func TestAccOneandoneServer_Basic(t *testing.T) {
 				),
 			},
 			resource.TestStep{
-				Config: fmt.Sprintf(testAccCheckOneandoneServer_basic, name_updated, name_updated),
+				Config: fmt.Sprintf(testAccCheckOneandoneServer_basic, name_updated, name_updated, updated_image),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
 						time.Sleep(10 * time.Second)
@@ -57,6 +59,7 @@ func TestAccOneandoneServer_Hardware(t *testing.T) {
 	var server oneandone.Server
 
 	name := "test_server_hardware"
+	image := "centos6-64min"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -66,7 +69,7 @@ func TestAccOneandoneServer_Hardware(t *testing.T) {
 		CheckDestroy: testAccCheckDOneandoneServerDestroyCheck,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: fmt.Sprintf(testAccCheckOneandoneServer_basic, name, name),
+				Config: fmt.Sprintf(testAccCheckOneandoneServer_basic, name, name, image),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
 						time.Sleep(10 * time.Second)
@@ -79,7 +82,7 @@ func TestAccOneandoneServer_Hardware(t *testing.T) {
 				),
 			},
 			resource.TestStep{
-				Config: fmt.Sprintf(testAccCheckOneandoneServer_hardware, name, name),
+				Config: fmt.Sprintf(testAccCheckOneandoneServer_hardware, name, name, image),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
 						time.Sleep(10 * time.Second)
@@ -166,7 +169,7 @@ const testAccCheckOneandoneServer_basic = `
 resource "oneandone_server" "server" {
   name = "%s"
   description = "%s"
-  image = "ubuntu"
+  image = "%s"
   datacenter = "GB"
   vcores = 1
   cores_per_processor = 1
@@ -184,7 +187,7 @@ const testAccCheckOneandoneServer_hardware = `
 resource "oneandone_server" "server" {
   name = "%s"
   description = "%s"
-  image = "ubuntu"
+  image = "%s"
   datacenter = "GB"
   vcores = 2
   cores_per_processor = 1

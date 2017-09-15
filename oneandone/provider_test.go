@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+	"time"
 )
 
 //
@@ -33,4 +34,5 @@ func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("ONEANDONE_TOKEN"); v == "" {
 		t.Fatal("ONEANDONE_TOKEN must be set for acceptance tests")
 	}
+	time.Sleep(20 * time.Second)
 }

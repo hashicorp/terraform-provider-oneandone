@@ -32,6 +32,7 @@ func resourceOneandOneServer() *schema.Resource {
 			"image": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"fixed_instance_size": {
 				Type:          schema.TypeString,
@@ -138,11 +139,23 @@ func resourceOneandOneServerCreate(d *schema.ResourceData, meta interface{}) err
 	saps, _ := config.API.ListServerAppliances()
 
 	var sa oneandone.ServerAppliance
+	imageName := d.Get("image").(string)
+
 	for _, a := range saps {
 
-		if a.Type == "IMAGE" && strings.Contains(strings.ToLower(a.Name), strings.ToLower(d.Get("image").(string))) {
+		if a.Type == "IMAGE" && strings.ToLower(a.Name) == strings.ToLower(imageName) {
 			sa = a
 			break
+		}
+	}
+	//if the exact name is not found we will try to match
+	if sa.Name != imageName {
+		for _, a := range saps {
+
+			if a.Type == "IMAGE" && strings.Contains(strings.ToLower(a.Name), strings.ToLower(d.Get("image").(string))) {
+				sa = a
+				break
+			}
 		}
 	}
 
