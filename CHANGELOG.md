@@ -1,8 +1,18 @@
-## 0.1.2 (Unreleased)
+## 1.1.1 (Unreleased)
+
+FEATURES:
+
+* **New Data Source:** `oneandone_instance_size` (#4)[https://github.com/terraform-providers/terraform-provider-oneandone/issues/4]
+
+IMPROVEMENTS: 
+
+* `oneandone_server` - added `fixed_instance_size` parameter [GH-5]
+* `oneandone_server` - added `ssh_key_public` parameter [GH-6]
 
 BUG FIXES:
 
-* https://github.com/terraform-providers/terraform-provider-oneandone/issues/8
+* resource/resource_oneandone_server.go: Added missing update hardware function [GH-2]
+* resource/resource_oneandone_server.go: Added `ForceNew` on image parameter of server resource [GH-8]
 
 
 
