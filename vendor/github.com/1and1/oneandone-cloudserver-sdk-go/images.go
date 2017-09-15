@@ -6,15 +6,19 @@ import (
 
 type Image struct {
 	idField
-	ImageConfig
+	nameField
+	descField
 	MinHddSize   int         `json:"min_hdd_size"`
-	Architecture *int        `json:"os_architecture"`
+	Architecture *int        `json:"architecture,omitempty"`
+	NumImages    *int        `json:"num_images,omitempty"`
+	Frequency    string      `json:"frequency,omitempty"`
+	ServerId     string      `json:"server_id,omitempty"`
 	CloudPanelId string      `json:"cloudpanel_id,omitempty"`
 	CreationDate string      `json:"creation_date,omitempty"`
 	State        string      `json:"state,omitempty"`
 	OsImageType  string      `json:"os_image_type,omitempty"`
-	OsFamily     string      `json:"os_family,omitempty"`
 	Os           string      `json:"os,omitempty"`
+	OsFamily     string      `json:"os_family,omitempty"`
 	OsVersion    string      `json:"os_version,omitempty"`
 	Type         string      `json:"type,omitempty"`
 	Licenses     []License   `json:"licenses,omitempty"`
@@ -23,12 +27,25 @@ type Image struct {
 	ApiPtr
 }
 
-type ImageConfig struct {
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
-	Frequency   string `json:"frequency,omitempty"`
-	ServerId    string `json:"server_id,omitempty"`
-	NumImages   int    `json:"num_images"`
+type ImageRequest struct {
+	Name         string `json:"name,omitempty"`
+	Description  string `json:"description,omitempty"`
+	Frequency    string `json:"frequency,omitempty"`
+	ServerId     string `json:"server_id,omitempty"`
+	DatacenterId string `json:"datacenter_id,omitempty"`
+	Source       string `json:"source,omitempty"`
+	Url          string `json:"url,omitempty"`
+	OsId         string `json:"os_id,omitempty"`
+	Type         string `json:"type,omitempty"`
+	NumImages    *int   `json:"num_images,omitempty"`
+}
+
+type ImageOs struct {
+	idField
+	Architecture *int   `json:"architecture,omitempty"`
+	Os           string `json:"os,omitempty"`
+	OsFamily     string `json:"os_family,omitempty"`
+	OsVersion    string `json:"os_version,omitempty"`
 }
 
 // GET /images
@@ -48,8 +65,23 @@ func (api *API) ListImages(args ...interface{}) ([]Image, error) {
 	return result, nil
 }
 
+// GET /images/os
+func (api *API) ListImageOs(args ...interface{}) ([]ImageOs, error) {
+	url, err := processQueryParams(createUrl(api, imagePathSegment, "os"), args...)
+	if err != nil {
+		return nil, err
+	}
+	result := []ImageOs{}
+	err = api.Client.Get(url, &result, http.StatusOK)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 // POST /images
-func (api *API) CreateImage(request *ImageConfig) (string, *Image, error) {
+func (api *API) CreateImage(request *ImageRequest) (string, *Image, error) {
 	res := new(Image)
 	url := createUrl(api, imagePathSegment)
 	err := api.Client.Post(url, &request, &res, http.StatusAccepted)

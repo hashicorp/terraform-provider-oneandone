@@ -1,8 +1,8 @@
 # 1&amp;1  Cloudserver Go SDK
 
-The 1&amp;1  Go SDK is a Go library designed for interaction with the 1&amp;1  cloud platform over the REST API.
+The 1&amp;1  Go SDK is a Go library designed for interaction with the 1&amp;1  cloud platform over the REST API. 
 
-This guide contains instructions on getting started with the library and automating various management tasks available through the 1&amp;1  Cloud Panel UI.
+This guide contains instructions on getting started with the library and automating various management tasks available through the 1&amp;1  Cloud Panel UI. For more information on the 1&amp;1  Cloudserver Go SDK see the [1&1 Community Portal](https://www.1and1.com/cloud-community/).
 
 ## Table of Contents
 
@@ -349,17 +349,53 @@ If any of the parameters `sort`, `query` or `fields` is set to an empty string, 
 **Create an image:**
 
 ```
-request := oneandone.ImageConfig {
+request := oneandone.ImageRequest {
     Name: image_name,
     Description: image_description,
+    Source: 'server',
     ServerId: server_id, 
     Frequency: image_frequenct,
     NumImages: number_of_images,
+    DatacenterId: datacenter_id,
   }
 
 image_id, image, err = api.CreateImage(&request)
 ```
-All fields except `Description` are required. `Frequency` may be set to `"ONCE"`, `"DAILY"` or `"WEEKLY"`.
+`Description`, `Source` and `DatacenterId` are optional fields when creating a server image. `Frequency` may be set to `"ONCE"`, `"DAILY"` or `"WEEKLY"`.
+
+Use the same method to import an existing ISO image.
+
+```
+request := oneandone.ImageRequest {
+    Name: image_name,
+    Description: image_description,
+    Source: 'iso',
+    Url: image_url,
+    Type: image_type,
+    OsId: os_id,
+    DatacenterId: datacenter_id,
+  }
+```
+`Type` should be set to `os` or `app`. `OsId` is required if the image type is `os`.
+
+To import a `vdi`, `qcow`, `qcow2`, `vhd`, `vhdx` or `vmdk` image, instantiate the image request as follows:
+
+```
+request := oneandone.ImageRequest {
+    Name: image_name,
+    Description: image_description,
+    Source: 'image',
+    Url: image_url,
+    OsId: os_id,
+    DatacenterId: datacenter_id,
+  }
+```
+
+
+**List image OSes:**
+
+`imageOSes, err = api.ListImageOs()`
+
 
 **Update an image:**
 
@@ -1856,7 +1892,7 @@ func (api *API) CreateFirewallPolicy(fp_data *FirewallPolicyRequest) (string, *F
 ```
 
 ```Go
-func (api *API) CreateImage(request *ImageConfig) (string, *Image, error)
+func (api *API) CreateImage(request *ImageRequest) (string, *Image, error)
 ```
 
 ```Go
@@ -2189,6 +2225,10 @@ func (api *API) ListFirewallPolicyServerIps(fp_id string) ([]ServerIpInfo, error
 
 ```Go
 func (api *API) ListFixedInstanceSizes() ([]FixedInstanceInfo, error)
+```
+
+```Go
+func (api *API) ListImageOs(args ...interface{}) ([]ImageOs, error)
 ```
 
 ```Go
