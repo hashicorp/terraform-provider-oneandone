@@ -13,7 +13,6 @@ type Image struct {
 	NumImages    *int        `json:"num_images,omitempty"`
 	Frequency    string      `json:"frequency,omitempty"`
 	ServerId     string      `json:"server_id,omitempty"`
-	CloudPanelId string      `json:"cloudpanel_id,omitempty"`
 	CreationDate string      `json:"creation_date,omitempty"`
 	State        string      `json:"state,omitempty"`
 	OsImageType  string      `json:"os_image_type,omitempty"`

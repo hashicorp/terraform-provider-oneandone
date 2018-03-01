@@ -108,18 +108,18 @@ func resourceOneandOneVPNRead(d *schema.ResourceData, meta interface{}) error {
 
 	vpn, err := config.API.GetVPN(d.Id())
 
-	base64_str, err := config.API.GetVPNConfigFile(d.Id())
+	var download_path string
+	if raw, ok := d.GetOk("download_path"); ok {
+		download_path = raw.(string)
+	}
+
+	base64_str, err := config.API.GetVPNConfigFile(download_path, d.Id())
 	if err != nil {
 		if strings.Contains(err.Error(), "404") {
 			d.SetId("")
 			return nil
 		}
 		return err
-	}
-
-	var download_path string
-	if raw, ok := d.GetOk("download_path"); ok {
-		download_path = raw.(string)
 	}
 
 	path, fileName, err := writeCofnig(vpn, download_path, base64_str)
@@ -143,11 +143,7 @@ func writeCofnig(vpn *oneandone.VPN, path, base64config string) (string, string,
 	}
 
 	var fileName string
-	if vpn.CloudPanelId != "" {
-		fileName = vpn.CloudPanelId + ".zip"
-	} else {
-		fileName = "vpn_" + fmt.Sprintf("%x", md5.Sum(data)) + ".zip"
-	}
+	fileName = "vpn_" + fmt.Sprintf("%x", md5.Sum(data)) + ".zip"
 
 	if path == "" {
 		path, err = os.Getwd()

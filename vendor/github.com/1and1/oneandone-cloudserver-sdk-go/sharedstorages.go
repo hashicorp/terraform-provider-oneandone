@@ -11,7 +11,6 @@ type SharedStorage struct {
 	MinSizeAllowed int                   `json:"minimum_size_allowed"`
 	SizeUsed       string                `json:"size_used,omitempty"`
 	State          string                `json:"state,omitempty"`
-	CloudPanelId   string                `json:"cloudpanel_id,omitempty"`
 	SiteId         string                `json:"site_id,omitempty"`
 	CifsPath       string                `json:"cifs_path,omitempty"`
 	NfsPath        string                `json:"nfs_path,omitempty"`

@@ -18,7 +18,6 @@ type MonitoringPolicy struct {
 	Thresholds   *MonitoringThreshold `json:"thresholds,omitempty"`
 	Ports        []MonitoringPort     `json:"ports,omitempty"`
 	Processes    []MonitoringProcess  `json:"processes,omitempty"`
-	CloudPanelId string               `json:"cloudpanel_id,omitempty"`
 }
 
 type MonitoringThreshold struct {

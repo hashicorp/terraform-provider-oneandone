@@ -7,7 +7,6 @@ import (
 type PrivateNetwork struct {
 	Identity
 	descField
-	CloudpanelId   string      `json:"cloudpanel_id,omitempty"`
 	NetworkAddress string      `json:"network_address,omitempty"`
 	SubnetMask     string      `json:"subnet_mask,omitempty"`
 	State          string      `json:"state,omitempty"`

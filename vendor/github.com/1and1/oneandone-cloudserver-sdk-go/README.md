@@ -26,10 +26,13 @@ This guide contains instructions on getting started with the library and automat
   - [Roles](#roles)
   - [Usages](#usages)
   - [Server Appliances](#server-appliances)
+  - [Recovery Images](#recovery-images)
   - [DVD ISO](#dvd-iso)
   - [Ping](#ping)
   - [Pricing](#pricing)
   - [Data Centers](#data-centers)
+  - [Block Storages](#block-storages)
+  - [SSH Keys](#ssh-keys)
 - [Examples](#examples)
 - [Index](#index)
 
@@ -102,6 +105,14 @@ If any of the parameters `sort`, `query` or `fields` is set to an empty string, 
 
 `fis, err := api.GetFixedInstanceSize(fis_id)`
 
+**List bare metal models:**
+
+`res, err := api.ListBaremetalModels()`
+
+**Retrieve information about a bare metal model:**
+
+`bmm, err := api.GetBaremetalModel(baremetalModelId)`
+
 **Retrieve information about a server's hardware:**
 
 `hardware, err := api.GetServerHardware(server_id)`
@@ -154,7 +165,7 @@ If any of the parameters `sort`, `query` or `fields` is set to an empty string, 
 
 `snapshot, err := api.GetServerSnapshot(server_id)`
 
-**Create a server:**
+**Create a cloud server:**
 
 ```
 req := oneandone.ServerRequest {
@@ -162,6 +173,7 @@ req := oneandone.ServerRequest {
     Description: "Server description.",
     ApplianceId: server_appliance_id,
     PowerOn:     true,
+    ServerType:  "cloud",
     Hardware:    oneandone.Hardware {
       Vcores:            1,
       CoresPerProcessor: 1,
@@ -171,6 +183,24 @@ req := oneandone.ServerRequest {
             Size:   100,
             IsMain: true,
         },
+      },
+    },
+  }
+
+server_id, server, err := api.CreateServer(&req)
+```
+
+**Create a bare metal server:**
+
+```
+req := oneandone.ServerRequest {
+    Name:        "Server Name",
+    Description: "Server description.",
+    ApplianceId: server_appliance_id,
+    PowerOn:     true,
+    ServerType:  "baremetal",
+    Hardware:    oneandone.Hardware {
+      BaremetalModelId: "baremetal_model_id"
       },
     },
   }
@@ -283,6 +313,14 @@ Set `keep_ip` to true for releasing the IP without removing it.
 **Reboot a server:**
 
 `server, err := api.RebootServer(server_id, is_hardware)`
+
+Set `is_hardware` to true for HARDWARE method of rebooting.
+
+Set `is_hardware` to false for SOFTWARE method of rebooting.
+
+**Recovery Reboot a server:**
+
+`server, err := api.RecoveryRebootServer(server_id, is_hardware, recovery_image_id)`
 
 Set `is_hardware` to true for HARDWARE method of rebooting.
 
@@ -1489,6 +1527,31 @@ If any of the parameters `sort`, `query` or `fields` is blank, it is ignored in 
 
 `server_appliance, err := api.GetServerAppliance(appliance_id)`
 
+### Recovery Images
+
+**List all the recovery images that you can use to recovery reboot into:**
+
+`res, err := api.ListRecoveryAppliances()`
+
+Alternatively, use the method with query parameters.
+
+`res, err := api.ListRecoveryAppliances(page, per_page, sort, query, fields)`
+
+To paginate the list of server appliances received in the response use `page` and `per_page` parameters. Set `per_page` to the number of server appliances that will be shown in each page. `page` indicates the current page. When set to an integer value that is less or equal to zero, the parameters are ignored by the framework.
+
+To receive the list of server appliances sorted in expected order pass a server appliance property (e.g. `"os"`) in `sort` parameter. Prefix the sorting attribute with `-` sign for sorting in descending order.
+
+Use `query` parameter to search for a string in the response and return only the server appliance instances that contain it.
+
+To retrieve a collection of server appliances containing only the requested fields pass a list of comma separated properties (e.g. `"id,os,architecture"`) in `fields` parameter.
+
+If any of the parameters `sort`, `query` or `fields` is blank, it is ignored in the request.
+
+**Retrieve information about specific recovery image:**
+
+`ra, err := api.GetRecoveryAppliance(image_id)`
+
+
 
 ### DVD ISO
 
@@ -1551,6 +1614,115 @@ Here is another example of an alternative form of the list function that include
 
 `datacenter, err := api.GetDatacenter(datacenter_id)`
 
+### Block Storages
+
+**List block storages:**
+
+`blcs, err := api.ListBlockStorages()`
+
+Alternatively, use the method with query parameters.
+
+`blcs, err := api.ListBlockStorages(page, per_page, sort, query, fields)`
+
+To paginate the list of block storages received in the response use `page` and `per_page` parameters. Set `per_page` to the number of block storages that will be shown in each page. `page` indicates the current page. When set to an integer value that is less or equal to zero, the parameters are ignored by the framework.
+
+To receive the list of block storages sorted in expected order pass a volume property (e.g. `"name"`) in `sort` parameter. Prefix the sorting attribute with `-` sign for sorting in descending order.
+
+Use `query` parameter to search for a string in the response and return only the volume instances that contain it.
+
+To retrieve a collection of block storages containing only the requested fields pass a list of comma separated properties (e.g. `"id,name,size"`) in `fields` parameter.
+
+If any of the parameters `sort`, `query` or `fields` is set to an empty string, it is ignored in the request.
+
+**Retrieve a block storage:**
+
+`blcs, err := api.GetBlockStorage(blcs_id)`
+
+
+**Create a block storage:**
+
+```
+request := oneandone.BlockStorageRequest {
+    Name: test_blcs_name, 
+    Description: test_blcs_desc,
+    Size: oneandone.Int2Pointer(size),
+    DatacenterId: datacenter_id,
+    ServerId: server_id
+  }
+  
+blcs_id, blcs, err := api.CreateBlockStorage(&request)
+
+```
+`Description` and `ServerId`are optional parameters.
+
+
+**Remove a block storage storage:**
+
+`blcs, err := api.DeleteBlockStorage(blcs_id)`
+
+
+**Add a server to a block storage:**
+
+`blcs, err := api.AddBlockStorageServer(blcs_id, server_id)`
+
+
+**Retrieve a block storage server:**
+
+`blcs_server, err := api.GetBlockStorageServer(blcs_id)`
+
+				
+**Remove a server from a block storage:**
+
+`blcs, err := api.RemoveBlockStorageServer(blcs_id, server_id)`
+
+### SSH Keys
+
+**List ssh keys:**
+
+`sk, err := api.ListSSHKeys()`
+
+Alternatively, use the method with query parameters.
+
+`sk, err := api.ListSSHKeys(page, per_page, sort, query, fields)`
+
+To paginate the list of ssh keys received in the response use `page` and `per_page` parameters. Set `per_page` to the number of ssh keys that will be shown in each page. `page` indicates the current page. When set to an integer value that is less or equal to zero, the parameters are ignored by the framework.
+
+To receive the list of ssh keys sorted in expected order pass a volume property (e.g. `"name"`) in `sort` parameter. Prefix the sorting attribute with `-` sign for sorting in descending order.
+
+Use `query` parameter to search for a string in the response and return only the volume instances that contain it.
+
+To retrieve a collection of ssh keys containing only the requested fields pass a list of comma separated properties (e.g. `"state,md5"`) in `fields` parameter.
+
+If any of the parameters `sort`, `query` or `fields` is set to an empty string, it is ignored in the request.
+
+**Retrieve an ssh key:**
+
+`sk, err := api.GetSSHKey(sk_id)`
+
+
+**Create an ssh key:**
+
+```
+request := oneandone.SSHKeyRequest {
+    Name: test_sk_name, 
+    Description: test_sk_desc,
+    PublicKey: pub_key
+  }
+  
+sk_id, sk, err := api.CreateSSHKey(&request)
+
+```
+
+
+**Rename an ssh key:**
+
+`sk, err := oneandone.RenameSSHKey(sk_id, new_name, new_desc)`
+
+
+**Remove an ssh key:**
+
+`sk, err := api.DeleteSSHKey(sk_id)`
+
 
 ## Examples
 
@@ -1584,7 +1756,8 @@ func main() {
 		Name:        "Example Server",
 		Description: "Example server description.",
 		ApplianceId: sa.Id,
-		PowerOn:	 true,
+		PowerOn:     True,
+		ServerType:  "cloud",
 		Hardware:    oneandone.Hardware{
 			Vcores:            1,
 			CoresPerProcessor: 1,
@@ -2032,6 +2205,10 @@ func (api *API) EjectServerDvd(server_id string) (*Server, error)
 ```
 
 ```Go
+func (api *API) GetBaremetalModel(bm_id string) (*BaremetalModel, error)
+```
+
+```Go
 func (api *API) GetCurrentUserPermissions() (*Permissions, error)
 ```
 
@@ -2113,6 +2290,10 @@ func (api *API) GetPrivateNetworkServer(pn_id string, server_id string) (*Identi
 
 ```Go
 func (api *API) GetPublicIp(ip_id string) (*PublicIp, error)
+```
+
+```Go
+func (api *API) GetRecoveryAppliance(ra_id string) (*SingleRecoveryAppliance, error)
 ```
 
 ```Go
@@ -2204,6 +2385,10 @@ func (api *API) GetVPNConfigFile(vpn_id string) (string, error)
 ```
 
 ```Go
+func (api *API) ListBaremetalModels(args ...interface{}) ([]BaremetalModel, error)
+```
+
+```Go
 func (api *API) ListDatacenters(args ...interface{}) ([]Datacenter, error)
 ```
 
@@ -2281,6 +2466,10 @@ func (api *API) ListPrivateNetworks(args ...interface{}) ([]PrivateNetwork, erro
 
 ```Go
 func (api *API) ListPublicIps(args ...interface{}) ([]PublicIp, error)
+```
+
+```Go
+func (api *API) ListRecoveryAppliances(args ...interface{}) ([]RecoveryAppliance, error)
 ```
 
 ```Go
@@ -2381,6 +2570,10 @@ func (api *API) PingAuth() ([]string, error)
 
 ```Go
 func (api *API) RebootServer(server_id string, is_hardware bool) (*Server, error)
+```
+
+```Go
+func (api *API) RecoveryRebootServer(server_id string, is_hardware bool, recovery_image_id string)
 ```
 
 ```Go
