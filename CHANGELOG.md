@@ -1,4 +1,8 @@
 ## 1.0.1 (Unreleased)
+
+IMPROVEMENTS: 
+* README update (#13)[https://github.com/terraform-providers/terraform-provider-oneandone/pull/13]
+
 ## 1.0.0 (December 18, 2017)
 
 FEATURES:
