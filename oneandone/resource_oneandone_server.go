@@ -323,7 +323,7 @@ func resourceOneandOneServerRead(d *schema.ResourceData, meta interface{}) error
 	if server.Hardware.FixedInsSizeId != "" {
 		d.Set("fixed_instance_size", server.Hardware.FixedInsSizeId)
 	} else {
-		d.Set("hdds", readHdds(server.Hardware))
+		d.Set("hdds", readHdds(server.Hardware, config))
 	}
 
 	d.Set("ips", readIps(server.Ips))
@@ -487,20 +487,8 @@ func resourceOneandOneServerUpdate(d *schema.ResourceData, meta interface{}) err
 			return err
 		}
 
-		o, n := d.GetChange("firewall_policy_id")
-		if n == nil {
-			for _, ip := range server.Ips {
-				mp, err := config.API.DeleteFirewallPolicyServerIp(o.(string), ip.Id)
-				if err != nil {
-					return err
-				}
-
-				err = config.API.WaitForState(mp, "ACTIVE", 30, config.Retries)
-				if err != nil {
-					return err
-				}
-			}
-		} else {
+		_, n := d.GetChange("firewall_policy_id")
+		if n != nil {
 			ip_ids := []string{}
 			for _, ip := range server.Ips {
 				ip_ids = append(ip_ids, ip.Id)
@@ -555,7 +543,18 @@ func resourceOneandOneServerDelete(d *schema.ResourceData, meta interface{}) err
 
 	_, ok := d.GetOk("ip")
 
-	server, err := config.API.DeleteServer(d.Id(), ok)
+	server, err := config.API.GetServer(d.Id())
+	if err != nil {
+		return err
+	}
+
+	err = config.API.WaitForState(server, "POWERED_ON", 50, config.Retries)
+
+	if err != nil {
+		return err
+	}
+
+	server, err = config.API.DeleteServer(d.Id(), ok)
 	if err != nil {
 		return err
 	}
@@ -569,7 +568,14 @@ func resourceOneandOneServerDelete(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func readHdds(hardware *oneandone.Hardware) []map[string]interface{} {
+func readHdds(hardware *oneandone.Hardware, config *Config) []map[string]interface{} {
+	for i := len(hardware.Hdds) - 1; i >= 0; i-- {
+		bs, _ := config.API.GetBlockStorage(hardware.Hdds[i].Id)
+		if bs != nil {
+			hardware.Hdds = append(hardware.Hdds[:i], hardware.Hdds[i+1:]...)
+		}
+	}
+
 	hdds := make([]map[string]interface{}, 0, len(hardware.Hdds))
 
 	for _, hd := range hardware.Hdds {

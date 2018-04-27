@@ -9,15 +9,14 @@ type Log struct {
 	ApiPtr
 	idField
 	typeField
-	CloudPanelId string    `json:"cloudpanel_id,omitempty"`
-	SiteId       string    `json:"site_id,omitempty"`
-	StartDate    string    `json:"start_date,omitempty"`
-	EndDate      string    `json:"end_date,omitempty"`
-	Action       string    `json:"action,omitempty"`
-	Duration     int       `json:"duration"`
-	Status       *Status   `json:"Status,omitempty"`
-	Resource     *Identity `json:"resource,omitempty"`
-	User         *Identity `json:"user,omitempty"`
+	SiteId    string    `json:"site_id,omitempty"`
+	StartDate string    `json:"start_date,omitempty"`
+	EndDate   string    `json:"end_date,omitempty"`
+	Action    string    `json:"action,omitempty"`
+	Duration  int       `json:"duration"`
+	Status    *Status   `json:"Status,omitempty"`
+	Resource  *Identity `json:"resource,omitempty"`
+	User      *Identity `json:"user,omitempty"`
 }
 
 // GET /logs

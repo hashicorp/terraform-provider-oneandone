@@ -254,6 +254,7 @@ func resourceOneandOnePrivateNetworkDelete(d *schema.ResourceData, meta interfac
 	config := meta.(*Config)
 
 	pn, err := config.API.GetPrivateNetwork(d.Id())
+	servers := pn.Servers
 
 	for _, server := range pn.Servers {
 		srv, err := config.API.ShutdownServer(server.Id, false)
@@ -276,7 +277,7 @@ func resourceOneandOnePrivateNetworkDelete(d *schema.ResourceData, meta interfac
 		return err
 	}
 
-	for _, server := range pn.Servers {
+	for _, server := range servers {
 		srv, err := config.API.StartServer(server.Id)
 		if err != nil {
 			return err

@@ -22,7 +22,6 @@ type LoadBalancer struct {
 	Rules                 []LoadBalancerRule `json:"rules,omitempty"`
 	ServerIps             []ServerIpInfo     `json:"server_ips,omitempty"`
 	Datacenter            *Datacenter        `json:"datacenter,omitempty"`
-	CloudPanelId          string             `json:"cloudpanel_id,omitempty"`
 }
 
 type LoadBalancerRule struct {

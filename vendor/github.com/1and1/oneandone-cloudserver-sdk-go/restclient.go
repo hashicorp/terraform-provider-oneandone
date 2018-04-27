@@ -44,9 +44,14 @@ func (c *restClient) Put(url string, requestBody interface{}, result interface{}
 }
 
 func (c *restClient) doRequest(url string, method string, requestBody interface{}, result interface{}, expectedStatus int) error {
+	maxRetries := 5
+	retriesCount := 0
 	var bodyData io.Reader
 	if requestBody != nil {
-		data, _ := json.Marshal(requestBody)
+		data, err := json.Marshal(requestBody)
+		if err != nil {
+			return err
+		}
 		bodyData = bytes.NewBuffer(data)
 	}
 
@@ -55,25 +60,61 @@ func (c *restClient) doRequest(url string, method string, requestBody interface{
 		return err
 	}
 
-	request.Header.Add("X-Token", c.token)
-	request.Header.Add("Content-Type", "application/json")
-	client := http.Client{}
+	for {
+		request.Header.Add("X-Token", c.token)
+		request.Header.Add("Content-Type", "application/json")
 
-	if c.transport != nil {
-		client.Transport = c.transport
-	}
+		client := http.Client{}
+		if c.transport != nil {
+			client.Transport = c.transport
+		}
 
-	response, err := client.Do(request)
-	if err = isError(response, expectedStatus, err); err != nil {
-		return err
-	}
+		response, err := client.Do(request)
 
-	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return err
+		if err != nil {
+			_, ok := err.(*p_url.Error)
+			if ok {
+				//EOF error, sending a retry
+				if retriesCount < maxRetries {
+					retriesCount++
+					time.Sleep(3 * time.Second)
+					continue
+				}
+			}
+			return err
+		}
+
+		if response != nil {
+			defer response.Body.Close()
+			body, err := ioutil.ReadAll(response.Body)
+			if err != nil {
+				return err
+			}
+			if response.StatusCode == http.StatusTooManyRequests {
+				retryAfter := response.Header.Get("X-Rate-Limit-Reset")
+				if retryAfter == "" {
+					return fmt.Errorf("no 'X-Rate-Limit-Reset' has been returned")
+				}
+
+				sleep, err := time.ParseDuration(retryAfter + "s")
+				if err != nil {
+					return err
+				}
+
+				time.Sleep(sleep)
+
+			} else if response.StatusCode != expectedStatus {
+				erResp := &errorResponse{}
+				err = json.Unmarshal(body, erResp)
+				if err != nil {
+					return err
+				}
+				return apiError{response.StatusCode, fmt.Sprintf("Type: %s; Message: %s", erResp.Type, erResp.Message)}
+			} else {
+				return c.unmarshal(body, result)
+			}
+		}
 	}
-	return c.unmarshal(body, result)
 }
 
 func (c *restClient) unmarshal(data []byte, result interface{}) error {
@@ -96,28 +137,6 @@ func (c *restClient) unmarshal(data []byte, result interface{}) error {
 	}
 
 	return nil
-}
-
-func isError(response *http.Response, expectedStatus int, err error) error {
-	if err != nil {
-		return err
-	}
-	if response != nil {
-		if response.StatusCode == expectedStatus {
-			// we got a response with the expected HTTP status code, hence no error
-			return nil
-		}
-		body, _ := ioutil.ReadAll(response.Body)
-		// extract the API's error message to be returned later
-		er_resp := new(errorResponse)
-		err = json.Unmarshal(body, er_resp)
-		if err != nil {
-			return err
-		}
-
-		return apiError{response.StatusCode, fmt.Sprintf("Type: %s; Message: %s", er_resp.Type, er_resp.Message)}
-	}
-	return errors.New("Generic error - no response from the REST API service.")
 }
 
 func createUrl(api *API, sections ...interface{}) string {
