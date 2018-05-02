@@ -31,8 +31,8 @@ func resourceOneandOneBlockStorage() *schema.Resource {
 				Optional: true,
 			},
 			"server_id": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:             schema.TypeString,
+				Optional:         true,
 				DiffSuppressFunc: suppressServerIdFunc,
 			},
 		},
