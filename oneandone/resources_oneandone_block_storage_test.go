@@ -47,7 +47,7 @@ func TestAccOneandoneBlockStorage_Basic(t *testing.T) {
 					testAccCheckOneandoneServerExists("oneandone_server.server", &server),
 					testAccCheckOneandoneBlockStorageExists("oneandone_block_storage.storage", &storage),
 					resource.TestCheckResourceAttr("oneandone_block_storage.storage", "name", name),
-					resource.TestCheckResourceAttr("oneandone_block_storage.storage", "server_id",""),
+					resource.TestCheckResourceAttr("oneandone_block_storage.storage", "server_id", ""),
 				),
 			},
 		},
