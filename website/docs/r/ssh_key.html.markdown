@@ -23,6 +23,6 @@ resource "oneandone_ssh_key" "sshkey" {
 
 The following arguments are supported:
 
-* `name` - (Required) The name of the storage
 * `description` - (Optional) Description for the ssh key
+* `name` - (Required) The name of the storage
 * `public_key` - (Optional) Public key to import. If not given, new SSH key pair will be created and the private key is returned in the response
