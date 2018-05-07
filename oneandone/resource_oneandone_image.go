@@ -66,8 +66,11 @@ func resourceOneandOneImageCreate(d *schema.ResourceData, meta interface{}) erro
 	config := meta.(*Config)
 
 	req := oneandone.ImageRequest{
-		ServerId: d.Get("server_id").(string),
 		Name:     d.Get("name").(string),
+	}
+
+	if serverId, ok := d.GetOk("server_id"); ok {
+		req.ServerId = serverId.(string)
 	}
 
 	if frequency, ok := d.GetOk("frequency"); ok {
@@ -160,7 +163,6 @@ func resourceOneandOneImageRead(d *schema.ResourceData, meta interface{}) error 
 	d.Set("type", img.Type)
 	d.Set("min_hdd_size", img.MinHddSize)
 	d.Set("licenses", img.Licenses)
-	d.Set("cloudpanel_id", img.CloudPanelId)
 	d.Set("state", img.State)
 	d.Set("description", img.Description)
 	d.Set("hdds", readImageHdds(img))
