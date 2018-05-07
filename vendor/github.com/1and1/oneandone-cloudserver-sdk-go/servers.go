@@ -11,9 +11,11 @@ type Server struct {
 	ApiPtr
 	Identity
 	descField
-	CloudPanelId  string           `json:"cloudpanel_id,omitempty"`
 	CreationDate  string           `json:"creation_date,omitempty"`
 	FirstPassword string           `json:"first_password,omitempty"`
+	ServerType    string           `json:"server_type,omitempty"`
+	Ipv6Range     string           `json:"ipv6_range,omitempty"`
+	Hostname      string           `json:"hostname,omitempty"`
 	Datacenter    *Datacenter      `json:"datacenter,omitempty"`
 	Status        *Status          `json:"status,omitempty"`
 	Hardware      *Hardware        `json:"hardware,omitempty"`
@@ -28,11 +30,12 @@ type Server struct {
 }
 
 type Hardware struct {
-	Vcores            int     `json:"vcore,omitempty"`
-	CoresPerProcessor int     `json:"cores_per_processor"`
-	Ram               float32 `json:"ram"`
-	Hdds              []Hdd   `json:"hdds,omitempty"`
-	FixedInsSizeId    string  `json:"fixed_instance_size_id,omitempty"`
+	Vcores            int         `json:"vcore,omitempty"`
+	CoresPerProcessor int         `json:"cores_per_processor"`
+	Ram               float32     `json:"ram"`
+	Hdds              []Hdd       `json:"hdds,omitempty"`
+	FixedInsSizeId    string      `json:"fixed_instance_size_id,omitempty"`
+	BaremetalModelId  interface{} `json:"baremetal_model_id,omitempty"`
 	ApiPtr
 }
 
@@ -42,8 +45,9 @@ type ServerHdds struct {
 
 type Hdd struct {
 	idField
-	Size   int  `json:"size,omitempty"`
-	IsMain bool `json:"is_main,omitempty"`
+	Size   int    `json:"size,omitempty"`
+	IsMain bool   `json:"is_main,omitempty"`
+	Unit   string `json:"unit,omitempty"`
 	ApiPtr
 }
 
@@ -102,6 +106,9 @@ type ServerRequest struct {
 	Hardware           Hardware `json:"hardware"`
 	ApplianceId        string   `json:"appliance_id,omitempty"`
 	Password           string   `json:"password,omitempty"`
+	ServerType         string   `json:"server_type,omitempty"`
+	Ipv6Range          string   `json:"ipv6_range,omitempty"`
+	Hostname           string   `json:"hostname,omitempty"`
 	PowerOn            bool     `json:"power_on"`
 	FirewallPolicyId   string   `json:"firewall_policy_id,omitempty"`
 	IpId               string   `json:"ip_id,omitempty"`
@@ -109,16 +116,36 @@ type ServerRequest struct {
 	MonitoringPolicyId string   `json:"monitoring_policy_id,omitempty"`
 	DatacenterId       string   `json:"datacenter_id,omitempty"`
 	SSHKey             string   `json:"rsa_key,omitempty"`
+	SSHPassword        *bool    `json:"ssh_password,omitempty"`
+	PublicKey          []string `json:"public_key,omitempty"`
 }
 
 type ServerAction struct {
-	Action string `json:"action,omitempty"`
-	Method string `json:"method,omitempty"`
+	Action          string  `json:"action,omitempty"`
+	Method          string  `json:"method,omitempty"`
+	RecoveryMode    *bool   `json:"recovery_mode,omitempty"`
+	RecoveryImageId *string `json:"recovery_image_id,omitempty"`
 }
 
 type FixedInstanceInfo struct {
 	Identity
 	Hardware *Hardware `json:"hardware,omitempty"`
+	ApiPtr
+}
+
+type BaremetalModel struct {
+	ApiPtr
+	Identity
+	descField
+	Hardware *BaremetalHardware `json:"hardware,omitempty"`
+}
+
+type BaremetalHardware struct {
+	Cores             int     `json:"core,omitempty"`
+	CoresPerProcessor int     `json:"cores_per_processor"`
+	Ram               float32 `json:"ram"`
+	Unit              string  `json:"unit,omitempty"`
+	Hdds              Hdd     `json:"hdds,omitempty"`
 	ApiPtr
 }
 
@@ -144,34 +171,7 @@ func (api *API) ListServers(args ...interface{}) ([]Server, error) {
 func (api *API) CreateServer(request *ServerRequest) (string, *Server, error) {
 	result := new(Server)
 	url := createUrl(api, serverPathSegment)
-	insert2map := func(hasht map[string]interface{}, key string, value string) {
-		if key != "" && value != "" {
-			hasht[key] = value
-		}
-	}
-	req := make(map[string]interface{})
-	hw := make(map[string]interface{})
-	req["name"] = request.Name
-	req["description"] = request.Description
-	req["appliance_id"] = request.ApplianceId
-	req["power_on"] = request.PowerOn
-	insert2map(req, "password", request.Password)
-	insert2map(req, "firewall_policy_id", request.FirewallPolicyId)
-	insert2map(req, "ip_id", request.IpId)
-	insert2map(req, "load_balancer_id", request.LoadBalancerId)
-	insert2map(req, "monitoring_policy_id", request.MonitoringPolicyId)
-	insert2map(req, "datacenter_id", request.DatacenterId)
-	insert2map(req, "rsa_key", request.SSHKey)
-	req["hardware"] = hw
-	if request.Hardware.FixedInsSizeId != "" {
-		hw["fixed_instance_size_id"] = request.Hardware.FixedInsSizeId
-	} else {
-		hw["vcore"] = request.Hardware.Vcores
-		hw["cores_per_processor"] = request.Hardware.CoresPerProcessor
-		hw["ram"] = request.Hardware.Ram
-		hw["hdds"] = request.Hardware.Hdds
-	}
-	err := api.Client.Post(url, &req, &result, http.StatusAccepted)
+	err := api.Client.Post(url, &request, &result, http.StatusAccepted)
 	if err != nil {
 		return "", nil, err
 	}
@@ -180,7 +180,7 @@ func (api *API) CreateServer(request *ServerRequest) (string, *Server, error) {
 	return result.Id, result, nil
 }
 
-// This is a wraper function for `CreateServer` that returns the server's IP address and first password.
+// This is a wrapper function for `CreateServer` that returns the server's IP address and first password.
 // The function waits at most `timeout` seconds for the server to be created.
 // The initial `POST /servers` response does not contain the IP address, so we need to wait
 // until the server is created.
@@ -514,6 +514,30 @@ func (api *API) RebootServer(server_id string, is_hardware bool) (*Server, error
 	return result, nil
 }
 
+// PUT /servers/{id}/status/action (action = REBOOT)
+func (api *API) RecoveryRebootServer(server_id string, is_hardware bool, recovery_image_id string) (*Server, error) {
+	result := new(Server)
+	request := ServerAction{}
+	request.Action = "REBOOT"
+	if is_hardware {
+		request.Method = "HARDWARE"
+	} else {
+		request.Method = "SOFTWARE"
+	}
+
+	b := true
+	request.RecoveryMode = &b
+	request.RecoveryImageId = &recovery_image_id
+	url := createUrl(api, serverPathSegment, server_id, "status", "action")
+	err := api.Client.Put(url, &request, &result, http.StatusAccepted)
+	if err != nil {
+		return nil, err
+	}
+	result.api = api
+	result.decodeRaws()
+	return result, nil
+}
+
 // PUT /servers/{id}/status/action (action = POWER_OFF)
 func (api *API) ShutdownServer(server_id string, is_hardware bool) (*Server, error) {
 	result := new(Server)
@@ -704,19 +728,6 @@ func (api *API) AssignServerIpFirewallPolicy(server_id string, ip_id string, fp_
 	return result, nil
 }
 
-// DELETE /servers/{server_id}/ips/{ip_id}/firewall_policy
-func (api *API) UnassignServerIpFirewallPolicy(server_id string, ip_id string) (*Server, error) {
-	result := new(Server)
-	url := createUrl(api, serverPathSegment, server_id, "ips", ip_id, "firewall_policy")
-	err := api.Client.Delete(url, nil, &result, http.StatusAccepted)
-	if err != nil {
-		return nil, err
-	}
-	result.api = api
-	result.decodeRaws()
-	return result, nil
-}
-
 // GET /servers/{id}/snapshots
 func (api *API) GetServerSnapshot(server_id string) (*ServerSnapshot, error) {
 	result := new(ServerSnapshot)
@@ -782,6 +793,35 @@ func (api *API) CloneServer(server_id string, new_name string, datacenter_id str
 	result.api = api
 	result.decodeRaws()
 	return result, nil
+}
+
+// GET /servers/baremetal_models
+func (api *API) ListBaremetalModels(args ...interface{}) ([]BaremetalModel, error) {
+	url, err := processQueryParams(createUrl(api, serverPathSegment, baremetalSegment), args...)
+	if err != nil {
+		return nil, err
+	}
+	res := []BaremetalModel{}
+	err = api.Client.Get(url, &res, http.StatusOK)
+	if err != nil {
+		return nil, err
+	}
+	for index, _ := range res {
+		res[index].api = api
+	}
+	return res, nil
+}
+
+// GET /servers/baremetal_models/{id}
+func (api *API) GetBaremetalModel(bm_id string) (*BaremetalModel, error) {
+	res := new(BaremetalModel)
+	url := createUrl(api, serverPathSegment, baremetalSegment, bm_id)
+	err := api.Client.Get(url, &res, http.StatusOK)
+	if err != nil {
+		return nil, err
+	}
+	//	res.api = api
+	return res, nil
 }
 
 func (s *Server) GetState() (string, error) {

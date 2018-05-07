@@ -1,12 +1,15 @@
 package oneandone
 
-import "net/http"
+import (
+	"encoding/base64"
+	"io/ioutil"
+	"net/http"
+)
 
 type VPN struct {
 	Identity
 	descField
 	typeField
-	CloudPanelId string      `json:"cloudpanel_id,omitempty"`
 	CreationDate string      `json:"creation_date,omitempty"`
 	State        string      `json:"state,omitempty"`
 	IPs          []string    `json:"ips,omitempty"`
@@ -94,15 +97,25 @@ func (api *API) DeleteVPN(vpn_id string) (*VPN, error) {
 
 // GET /vpns/{vpn_id}/configuration_file
 // Returns VPN configuration files (in a zip arhive) as a base64 encoded string
-func (api *API) GetVPNConfigFile(vpn_id string) (string, error) {
+func (api *API) GetVPNConfigFile(filepath string, vpn_id string) (string, error) {
 	result := new(configZipFile)
 	url := createUrl(api, vpnPathSegment, vpn_id, "configuration_file")
 	err := api.Client.Get(url, &result, http.StatusOK)
 	if err != nil {
 		return "", err
 	}
+	filestring, err := base64.StdEncoding.DecodeString(result.Base64String)
+	d1 := []byte(filestring)
+	fileErr := ioutil.WriteFile(filepath+".zip", d1, 0644)
+	check(fileErr)
 
 	return result.Base64String, nil
+}
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
 }
 
 func (vpn *VPN) GetState() (string, error) {
