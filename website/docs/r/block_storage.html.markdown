@@ -25,8 +25,8 @@ resource "oneandone_block_storage" "storage" {
 
 The following arguments are supported:
 
-* `name` - (Required) The name of the storage
-* `size` - (Required) Size of the block storage (`min: 20, max: 500, multipleOf: 10`)
 * `datacenter` - (Optional) Location of desired 1and1 datacenter, where the block storage will be created. Can be `DE`, `GB`, `US` or `ES`
 * `description` - (Optional) Description for the block storage
+* `name` - (Required) The name of the storage
 * `server_id` - (Optional) ID of the server that the block storage will be attached to
+* `size` - (Required) Size of the block storage (`min: 20, max: 500, multipleOf: 10`)

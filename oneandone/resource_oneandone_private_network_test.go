@@ -14,8 +14,8 @@ import (
 func TestAccOneandonePrivateNetwork_Basic(t *testing.T) {
 	var net oneandone.PrivateNetwork
 
-	name := "test2"
-	name_updated := "test2"
+	name := "test"
+	name_updated := "test1"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
