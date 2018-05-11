@@ -17,9 +17,7 @@ func resourceOneandOneImage() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"server_id": {
 				Type:     schema.TypeString,
-				Optional: true,
-
-				//DiffSuppressFunc: suppressImageAttributeFunc,
+				Required: true,
 			},
 			"name": {
 				Type:     schema.TypeString,
