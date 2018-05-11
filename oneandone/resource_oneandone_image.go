@@ -17,7 +17,9 @@ func resourceOneandOneImage() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"server_id": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
+
+				//DiffSuppressFunc: suppressImageAttributeFunc,
 			},
 			"name": {
 				Type:     schema.TypeString,
@@ -55,8 +57,9 @@ func resourceOneandOneImage() *schema.Resource {
 				Optional: true,
 			},
 			"type": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:             schema.TypeString,
+				Optional:         true,
+				DiffSuppressFunc: suppressImageAttributeFunc,
 			},
 		},
 	}
@@ -65,8 +68,10 @@ func resourceOneandOneImage() *schema.Resource {
 func resourceOneandOneImageCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 
-	req := oneandone.ImageRequest{
-		Name:     d.Get("name").(string),
+	req := oneandone.ImageRequest{}
+
+	if name, ok := d.GetOk("name"); ok {
+		req.Name = name.(string)
 	}
 
 	if serverId, ok := d.GetOk("server_id"); ok {
@@ -126,9 +131,23 @@ func resourceOneandOneImageCreate(d *schema.ResourceData, meta interface{}) erro
 
 func resourceOneandOneImageUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	updateReq := oneandone.UpdateImageRequest{}
+
 	if d.HasChange("name") || d.HasChange("description") || d.HasChange("frequency") {
-		img, err := config.API.UpdateImage(d.Id(), d.Get("name").(string),
-			d.Get("description").(string), d.Get("frequency").(string))
+		if d.HasChange("name") {
+			_, n := d.GetChange("name")
+			updateReq.Name = n.(string)
+		}
+		if d.HasChange("description") {
+			_, n := d.GetChange("description")
+			updateReq.Description = n.(string)
+		}
+		if d.HasChange("frequency") {
+			_, n := d.GetChange("frequency")
+			updateReq.Frequency = n.(string)
+		}
+
+		img, err := config.API.UpdateImage(d.Id(), &updateReq)
 		if err != nil {
 			return err
 		}
@@ -153,7 +172,6 @@ func resourceOneandOneImageRead(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
-	d.Set("name", img.Name)
 	d.Set("datacenter", img.Datacenter.CountryCode)
 	d.Set("os_family", img.OsFamily)
 	d.Set("os", img.Os)
@@ -164,12 +182,13 @@ func resourceOneandOneImageRead(d *schema.ResourceData, meta interface{}) error 
 	d.Set("min_hdd_size", img.MinHddSize)
 	d.Set("licenses", img.Licenses)
 	d.Set("state", img.State)
-	d.Set("description", img.Description)
 	d.Set("hdds", readImageHdds(img))
 	d.Set("server_id", img.ServerId)
-	d.Set("frequency", img.Frequency)
 	d.Set("num_images", img.NumImages)
 	d.Set("creation_date", img.CreationDate)
+	d.Set("name", strings.Split(img.Name, "_")[0])
+	d.Set("description", img.Description)
+	d.Set("frequency", img.Frequency)
 
 	return nil
 
@@ -203,4 +222,8 @@ func readImageHdds(image *oneandone.Image) []map[string]interface{} {
 	}
 
 	return hdds
+}
+
+func suppressImageAttributeFunc(k, old, new string, d *schema.ResourceData) bool {
+	return true
 }
