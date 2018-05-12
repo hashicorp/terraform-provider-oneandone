@@ -65,16 +65,14 @@ func (api *API) CreateSSHKey(request *SSHKeyRequest) (string, *SSHKey, error) {
 	return result.Id, result, nil
 }
 
-func (api *API) DeleteSSHKey(id string) ([]SSHKey, error) {
-	result := []SSHKey{}
+func (api *API) DeleteSSHKey(id string) (*SSHKey, error) {
+	result := new(SSHKey)
 	url := createUrl(api, sshkeyPathSegment, id)
 	err := api.Client.Delete(url, nil, &result, http.StatusOK)
 	if err != nil {
 		return nil, err
 	}
-	for index := range result {
-		result[index].api = api
-	}
+	result.api = api
 	return result, nil
 }
 
