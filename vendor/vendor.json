@@ -3,10 +3,10 @@
 	"ignore": "appengine test github.com/hashicorp/nomad/ github.com/hashicorp/terraform/backend",
 	"package": [
 		{
-			"checksumSHA1": "Cqi6QNB1iauhWb1rBs8zDIQ48fA=",
+			"checksumSHA1": "RLSAIxfNHwdKSHCgPzLSn/H1ErQ=",
 			"path": "github.com/1and1/oneandone-cloudserver-sdk-go",
-			"revision": "d16076d87749aec3eb213319179cef0ceaeb4b07",
-			"revisionTime": "2018-02-21T21:12:37Z"
+			"revision": "06f8ee22ac95ab892ef990bc1d3d290df4bf8896",
+			"revisionTime": "2018-05-11T16:59:04Z"
 		},
 		{
 			"checksumSHA1": "FIL83loX9V9APvGQIjJpbxq53F0=",
@@ -676,5 +676,5 @@
 			"versionExact": "v1.6.1"
 		}
 	],
-	"rootPath": "github.com/StackPointCloud/terraform-provider-oneandone"
+	"rootPath": "github.com/1and1/terraform-provider-oneandone"
 }
