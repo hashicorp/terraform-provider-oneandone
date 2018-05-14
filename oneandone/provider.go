@@ -37,6 +37,8 @@ func Provider() terraform.ResourceProvider {
 			"oneandone_monitoring_policy": resourceOneandOneMonitoringPolicy(),
 			"oneandone_loadbalancer":      resourceOneandOneLoadbalancer(),
 			"oneandone_vpn":               resourceOneandOneVPN(),
+			"oneandone_ssh_key":           resourceOneandOneSshKey(),
+			"oneandone_block_storage":     resourceOneandOneBlockStorage(),
 		},
 		ConfigureFunc: providerConfigure,
 		DataSourcesMap: map[string]*schema.Resource{

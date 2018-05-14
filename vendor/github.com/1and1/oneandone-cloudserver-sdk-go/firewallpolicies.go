@@ -8,7 +8,6 @@ type FirewallPolicy struct {
 	Identity
 	descField
 	DefaultPolicy uint8                `json:"default"`
-	CloudpanelId  string               `json:"cloudpanel_id,omitempty"`
 	CreationDate  string               `json:"creation_date,omitempty"`
 	State         string               `json:"state,omitempty"`
 	Rules         []FirewallPolicyRule `json:"rules,omitempty"`
@@ -131,18 +130,6 @@ func (api *API) AddFirewallPolicyServerIps(fp_id string, ip_ids []string) (*Fire
 
 	url := createUrl(api, firewallPolicyPathSegment, fp_id, "server_ips")
 	err := api.Client.Post(url, &request, &result, http.StatusAccepted)
-	if err != nil {
-		return nil, err
-	}
-	result.api = api
-	return result, nil
-}
-
-// DELETE /firewall_policies/{id}/server_ips/{id}
-func (api *API) DeleteFirewallPolicyServerIp(fp_id string, ip_id string) (*FirewallPolicy, error) {
-	result := new(FirewallPolicy)
-	url := createUrl(api, firewallPolicyPathSegment, fp_id, "server_ips", ip_id)
-	err := api.Client.Delete(url, nil, &result, http.StatusAccepted)
 	if err != nil {
 		return nil, err
 	}
