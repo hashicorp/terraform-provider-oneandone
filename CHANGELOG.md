@@ -1,8 +1,8 @@
 ## 1.0.1 (Unreleased)
 
 FEATURES:
-* **New Resource:** `oneandone_block_storage` [GH-14]
-* **New Resource:** `oneandone_ssh_key` [GH-14]
+* **New Resource:** `oneandone_block_storage` (#14)[https://github.com/terraform-providers/terraform-provider-oneandone/pull/14]
+* **New Resource:** `oneandone_ssh_key` (#14)[https://github.com/terraform-providers/terraform-provider-oneandone/pull/14]
 
 IMPROVEMENTS: 
 * README update (#13)[https://github.com/terraform-providers/terraform-provider-oneandone/pull/13]
