@@ -39,10 +39,9 @@ func resourceOneandOneImage() *schema.Resource {
 				Optional: true,
 			},
 			"datacenter": {
-				Type:             schema.TypeString,
-				Optional:         true,
-				ConflictsWith:    []string{"frequency"},
-				DiffSuppressFunc: suppressImageAttributeFunc,
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"frequency"},
 			},
 			"source": {
 				Type:     schema.TypeString,
@@ -185,7 +184,6 @@ func resourceOneandOneImageRead(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
-	d.Set("datacenter", img.Datacenter.CountryCode)
 	d.Set("os_family", img.OsFamily)
 	d.Set("os", img.Os)
 	d.Set("os_version", img.OsVersion)
