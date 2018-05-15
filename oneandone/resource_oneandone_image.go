@@ -42,6 +42,7 @@ func resourceOneandOneImage() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"frequency"},
+				DiffSuppressFunc: suppressImageAttributeFunc,
 			},
 			"source": {
 				Type:     schema.TypeString,
