@@ -46,7 +46,7 @@ type ServerHdds struct {
 type Hdd struct {
 	idField
 	Size   int    `json:"size,omitempty"`
-	IsMain bool   `json:"is_main,omitempty"`
+	IsMain bool   `json:"is_main"`
 	Unit   string `json:"unit,omitempty"`
 	ApiPtr
 }
@@ -118,6 +118,7 @@ type ServerRequest struct {
 	SSHKey             string   `json:"rsa_key,omitempty"`
 	SSHPassword        *bool    `json:"ssh_password,omitempty"`
 	PublicKey          []string `json:"public_key,omitempty"`
+	PrivateNetworkId   string   `json:"private_network_id,omitempty"`
 }
 
 type ServerAction struct {
@@ -251,11 +252,31 @@ func (api *API) GetFixedInstanceSize(fis_id string) (*FixedInstanceInfo, error) 
 }
 
 // DELETE /servers/{id}
-func (api *API) DeleteServer(server_id string, keep_ips bool) (*Server, error) {
+func (api *API) DeleteServer(server_id string, args ...interface{}) (*Server, error) {
 	result := new(Server)
 	url := createUrl(api, serverPathSegment, server_id)
-	pm := make(map[string]interface{}, 1)
-	pm["keep_ips"] = keep_ips
+
+	var keep_ips, keep_hdds, is_true bool
+	pm := make(map[string]interface{}, len(args))
+	for i, p := range args {
+		switch i {
+		case 0:
+			keep_ips, is_true = p.(bool)
+			if !is_true {
+				return nil, errors.New("1st parameter is keep_ips must be a bool")
+			} else {
+				pm["keep_ips"] = keep_ips
+			}
+		case 1:
+			keep_hdds, is_true = p.(bool)
+			if !is_true {
+				return nil, errors.New("2nd parameter is keep_hdds must be a bool")
+			} else {
+				pm["keep_hdds"] = keep_hdds
+			}
+		}
+	}
+
 	url = appendQueryParams(url, pm)
 	err := api.Client.Delete(url, nil, &result, http.StatusAccepted)
 	if err != nil {

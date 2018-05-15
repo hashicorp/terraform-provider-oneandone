@@ -39,12 +39,6 @@ type ImageRequest struct {
 	NumImages    *int   `json:"num_images,omitempty"`
 }
 
-type UpdateImageRequest struct {
-	Name         string `json:"name,omitempty"`
-	Description  string `json:"description,omitempty"`
-	Frequency    string `json:"frequency,omitempty"`
-}
-
 type ImageOs struct {
 	idField
 	Architecture *int   `json:"architecture,omitempty"`
@@ -122,10 +116,15 @@ func (api *API) DeleteImage(img_id string) (*Image, error) {
 }
 
 // PUT /images/{id}
-func (api *API) UpdateImage(img_id string, request *UpdateImageRequest) (*Image, error) {
+func (api *API) UpdateImage(img_id string, new_name string, new_desc string, new_freq string) (*Image, error) {
 	result := new(Image)
+	req := struct {
+		Name        string `json:"name,omitempty"`
+		Description string `json:"description,omitempty"`
+		Frequency   string `json:"frequency,omitempty"`
+	}{Name: new_name, Description: new_desc, Frequency: new_freq}
 	url := createUrl(api, imagePathSegment, img_id)
-	err := api.Client.Put(url, &request, &result, http.StatusOK)
+	err := api.Client.Put(url, &req, &result, http.StatusOK)
 	if err != nil {
 		return nil, err
 	}

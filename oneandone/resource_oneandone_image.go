@@ -39,9 +39,9 @@ func resourceOneandOneImage() *schema.Resource {
 				Optional: true,
 			},
 			"datacenter": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				ConflictsWith: []string{"frequency"},
+				Type:             schema.TypeString,
+				Optional:         true,
+				ConflictsWith:    []string{"frequency"},
 				DiffSuppressFunc: suppressImageAttributeFunc,
 			},
 			"source": {
