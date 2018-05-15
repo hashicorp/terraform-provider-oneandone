@@ -1,6 +1,7 @@
 package oneandone
 
 import (
+	"fmt"
 	"github.com/1and1/oneandone-cloudserver-sdk-go"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -17,7 +18,7 @@ func resourceOneandOneImage() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"server_id": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 			},
 			"name": {
 				Type:     schema.TypeString,
@@ -26,7 +27,7 @@ func resourceOneandOneImage() *schema.Resource {
 			"frequency": {
 				Type:          schema.TypeString,
 				Optional:      true,
-				ConflictsWith: []string{"datacenter_id"},
+				ConflictsWith: []string{"datacenter"},
 			},
 			"num_images": {
 				Type:         schema.TypeInt,
@@ -37,7 +38,7 @@ func resourceOneandOneImage() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"datacenter_id": {
+			"datacenter": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"frequency"},
@@ -88,8 +89,21 @@ func resourceOneandOneImageCreate(d *schema.ResourceData, meta interface{}) erro
 		req.Description = desc.(string)
 	}
 
-	if datacenterId, ok := d.GetOk("datacenter_id"); ok {
-		req.DatacenterId = datacenterId.(string)
+	if raw, ok := d.GetOk("datacenter"); ok {
+		dcs, err := config.API.ListDatacenters()
+
+		if err != nil {
+			return fmt.Errorf("An error occured while fetching list of datacenters %s", err)
+
+		}
+
+		decenter := raw.(string)
+		for _, dc := range dcs {
+			if strings.ToLower(dc.CountryCode) == strings.ToLower(decenter) {
+				req.DatacenterId = dc.Id
+				break
+			}
+		}
 	}
 
 	if source, ok := d.GetOk("source"); ok {
