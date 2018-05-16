@@ -1,4 +1,4 @@
-## 1.0.1 (Unreleased)
+## 1.1.0 (Unreleased)
 
 FEATURES:
 * **New Resource:** `oneandone_image` [#16](https://github.com/terraform-providers/terraform-provider-oneandone/pull/16)
