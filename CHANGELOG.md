@@ -1,6 +1,7 @@
 ## 1.0.1 (Unreleased)
 
 FEATURES:
+* **New Resource:** `oneandone_image` (#16)[https://github.com/terraform-providers/terraform-provider-oneandone/pull/16]
 * **New Resource:** `oneandone_block_storage` (#14)[https://github.com/terraform-providers/terraform-provider-oneandone/pull/14]
 * **New Resource:** `oneandone_ssh_key` (#14)[https://github.com/terraform-providers/terraform-provider-oneandone/pull/14]
 
