@@ -39,6 +39,7 @@ func Provider() terraform.ResourceProvider {
 			"oneandone_vpn":               resourceOneandOneVPN(),
 			"oneandone_ssh_key":           resourceOneandOneSshKey(),
 			"oneandone_block_storage":     resourceOneandOneBlockStorage(),
+			"oneandone_image":             resourceOneandOneImage(),
 		},
 		ConfigureFunc: providerConfigure,
 		DataSourcesMap: map[string]*schema.Resource{
