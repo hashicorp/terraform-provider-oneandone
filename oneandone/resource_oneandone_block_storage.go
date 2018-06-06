@@ -22,18 +22,17 @@ func resourceOneandOneBlockStorage() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
+			"datacenter": {
+				Type:     schema.TypeString,
+				Required: true,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"datacenter": {
+			"server_id": {
 				Type:     schema.TypeString,
 				Optional: true,
-			},
-			"server_id": {
-				Type:             schema.TypeString,
-				Optional:         true,
-				DiffSuppressFunc: suppressServerIdFunc,
 			},
 		},
 	}
@@ -106,7 +105,9 @@ func resourceOneandOneBlockStorageRead(d *schema.ResourceData, meta interface{})
 	if blockStorage.Server != nil && len(blockStorage.Server.Id) > 0 {
 		d.Set("server_id", blockStorage.Server.Id)
 	}
-	if blockStorage.Server == nil {
+
+	_, serverIdSetInConfig := d.GetOk("server_id")
+	if blockStorage.Server == nil && serverIdSetInConfig {
 		d.Set("server_id", "")
 	}
 
@@ -125,20 +126,46 @@ func resourceOneandOneBlockStorageUpdate(d *schema.ResourceData, meta interface{
 		return err
 	}
 
-	o, new_server_id := d.GetChange("server_id")
+	bsChanged := false
+	if d.HasChange("name") || d.HasChange("description") {
+		updateBlksReq := oneandone.UpdateBlockStorageRequest{}
 
-	if (blockStorage.Server != nil && blockStorage.Server.Id != new_server_id) ||
-		(blockStorage.Server == nil && len(new_server_id.(string)) > 0) {
-		_, err := config.API.AddBlockStorageServer(blockStorage.Id, new_server_id.(string))
-		if err != nil {
-			return err
+		_, new_name := d.GetChange("name")
+		if blockStorage.Name != new_name {
+			updateBlksReq.Name = new_name.(string)
+			bsChanged = true
+		}
+
+		_, new_description := d.GetChange("description")
+		if blockStorage.Description != new_description {
+			updateBlksReq.Description = new_description.(string)
+			bsChanged = true
+		}
+
+		if bsChanged {
+			_, err := config.API.UpdateBlockStorage(blockStorage.Id, &updateBlksReq)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	if blockStorage.Server != nil && len(new_server_id.(string)) == 0 {
-		_, err := config.API.RemoveBlockStorageServer(blockStorage.Id, o.(string))
-		if err != nil {
-			return err
+	if d.HasChange("server_id") {
+		o, new_server_id := d.GetChange("server_id")
+
+		if (blockStorage.Server != nil && blockStorage.Server.Id != new_server_id) ||
+			(blockStorage.Server == nil && len(new_server_id.(string)) > 0) {
+			_, err := config.API.AddBlockStorageServer(blockStorage.Id, new_server_id.(string))
+			if err != nil {
+				return err
+			}
+		}
+
+		if blockStorage.Server != nil && len(new_server_id.(string)) == 0 {
+			_, err := config.API.RemoveBlockStorageServer(blockStorage.Id, o.(string))
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -154,14 +181,20 @@ func resourceOneandOneBlockStorageUpdate(d *schema.ResourceData, meta interface{
 func resourceOneandOneBlockStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 
-	_, err := config.API.DeleteBlockStorage(d.Id())
+	bs, err := config.API.GetBlockStorage(d.Id())
+
+	if bs.Server != nil {
+		config.API.RemoveBlockStorageServer(bs.Id, bs.Server.Id)
+		err = config.API.WaitForState(bs, "POWERED_ON", 10, config.Retries)
+		if err != nil {
+			return err
+		}
+	}
+
+	_, err = config.API.DeleteBlockStorage(d.Id())
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func suppressServerIdFunc(k, old, new string, d *schema.ResourceData) bool {
-	return true
 }
