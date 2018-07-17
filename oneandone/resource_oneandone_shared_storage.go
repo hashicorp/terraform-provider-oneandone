@@ -219,7 +219,10 @@ func resourceOneandOneSharedStorageRead(d *schema.ResourceData, meta interface{}
 	d.Set("description", ss.Description)
 	d.Set("size", ss.Size)
 	d.Set("datacenter", ss.Datacenter.CountryCode)
-	d.Set("storage_servers", getStorageServers(ss.Servers))
+	storageServers := getStorageServers(ss.Servers)
+	if storageServers != nil && len(storageServers) > 0 {
+		d.Set("storage_servers", getStorageServers(ss.Servers))
+	}
 
 	return nil
 }
