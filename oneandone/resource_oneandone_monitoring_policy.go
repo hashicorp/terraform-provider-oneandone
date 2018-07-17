@@ -300,6 +300,7 @@ func resourceOneandOneMonitoringPolicyCreate(d *schema.ResourceData, meta interf
 	mp_request := oneandone.MonitoringPolicy{
 		Name:       d.Get("name").(string),
 		Agent:      d.Get("agent").(bool),
+		Email:      d.Get("email").(string),
 		Thresholds: getThresholds(d.Get("thresholds")),
 	}
 
@@ -309,6 +310,10 @@ func resourceOneandOneMonitoringPolicyCreate(d *schema.ResourceData, meta interf
 
 	if raw, ok := d.GetOk("processes"); ok {
 		mp_request.Processes = getProcesses(raw)
+	}
+
+	if description, ok := d.GetOk("description"); ok {
+		mp_request.Description = description.(string)
 	}
 
 	mp_id, mp, err := config.API.CreateMonitoringPolicy(&mp_request)
