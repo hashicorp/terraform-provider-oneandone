@@ -537,6 +537,8 @@ func resourceOneandOneMonitoringPolicyDelete(d *schema.ResourceData, meta interf
 		return err
 	}
 
+	mp.Id = d.Id()
+
 	err = config.API.WaitUntilDeleted(mp)
 	if err != nil {
 		return err
