@@ -1,4 +1,18 @@
 ## 1.2.0 (Unreleased)
+
+IMPROVEMENTS: 
+
+
+* Updated 1&1 Go SDK dependency [#19](https://github.com/terraform-providers/terraform-provider-oneandone/pull/19)
+* Updated block storage update method and test [#19](https://github.com/terraform-providers/terraform-provider-oneandone/pull/19)
+* Added email and description properties to monitoring policy create method [#19](https://github.com/terraform-providers/terraform-provider-oneandone/pull/19)
+* Updated monitoring policy test [#19](https://github.com/terraform-providers/terraform-provider-oneandone/pull/19)
+* WaitUntilDeleted improvements [#19](https://github.com/terraform-providers/terraform-provider-oneandone/pull/19)
+
+BUG FIXES:
+
+* Fixed issue with server attach [#18](https://github.com/terraform-providers/terraform-provider-oneandone/issues/18) 
+
 ## 1.1.0 (May 17, 2018)
 
 FEATURES:
