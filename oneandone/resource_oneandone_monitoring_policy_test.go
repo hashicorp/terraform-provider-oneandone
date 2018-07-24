@@ -113,100 +113,92 @@ func testAccCheckOneandoneMonitoringPolicyExists(n string, fw_p *oneandone.Monit
 
 const testAccCheckOneandoneMonitoringPolicy_basic = `
 resource "oneandone_monitoring_policy" "mp" {
-  name = "%s"
-  agent = true
-  email = "email@address.com"
-  thresholds = {
-    cpu = {
-      warning = {
-        value = 50,
-        alert = false
-      }
-      critical = {
-        value = 66,
-        alert = false
-      }
-    }
-    ram = {
-      warning = {
-        value = 70,
-        alert = true
-      }
-      critical = {
-        value = 80,
-        alert = true
-      }
-    },
-    ram = {
-      warning = {
-        value = 85,
-        alert = true
-      }
-      critical = {
-        value = 95,
-        alert = true
-      }
-    },
-    disk = {
-      warning = {
-        value = 84,
-        alert = true
-      }
-      critical = {
-        value = 94,
-        alert = true
-      }
-    },
-    transfer = {
-      warning = {
-        value = 1000,
-        alert = true
-      }
-      critical = {
-        value = 2000,
-        alert = true
-      }
-    },
-    internal_ping = {
-      warning = {
-        value = 3000,
-        alert = true
-      }
-      critical = {
-        value = 4000,
-        alert = true
-      }
-    }
-  }
-  ports = [
-    {
-      email_notification = true
-      port = 443
-      protocol = "TCP"
-      alert_if = "NOT_RESPONDING"
-    },
-    {
-      email_notification = false
-      port = 80
-      protocol = "TCP"
-      alert_if = "NOT_RESPONDING"
-    },
-    {
-      email_notification = true
-      port = 21
-      protocol = "TCP"
-      alert_if = "NOT_RESPONDING"
-    }
-  ]
-  processes = [
-    {
-      email_notification = false
-      process = "httpdeamon"
-      alert_if = "RUNNING"
-    },
-    {
-      process = "iexplorer",
-      alert_if = "NOT_RUNNING"
-      email_notification = true
-    }]
+	name = "%s"
+	description = "Testing TF mon policies"
+	agent = true
+	email = "email@address.com"
+  	thresholds = {
+    	cpu = {
+      		warning = {
+        		value = 50,
+        		alert = false
+      		}
+      		critical = {
+        		value = 66,
+        		alert = false
+      		}
+    	}
+		ram = {
+      		warning = {
+        		value = 70,
+        		alert = true
+			}
+			critical = {
+				value = 80,
+				alert = true
+			}
+		},
+		disk = {
+			warning = {
+				value = 84,
+				alert = true
+			}
+			critical = {
+				value = 94,
+				alert = true
+			}
+		},
+		internal_ping = {
+			warning = {
+				value = 80,
+				alert = true
+			}
+			critical = {
+				value = 95,
+				alert = true
+			}
+		}
+		transfer = {
+			warning = {
+				value = 1800,
+				alert = true
+			}
+			critical = {
+				value = 1900,
+				alert = true
+			}
+		},
+	},
+	ports = [
+		{
+			email_notification = true
+			port = 443
+			protocol = "TCP"
+			alert_if = "NOT_RESPONDING"
+		},
+		{
+			email_notification = false
+			port = 80
+			protocol = "TCP"
+			alert_if = "NOT_RESPONDING"
+		},
+		{
+			email_notification = true
+			port = 21
+			protocol = "TCP"
+			alert_if = "NOT_RESPONDING"
+		}
+	],
+	processes = [
+		{
+			email_notification = false
+			process = "httpdeamon"
+			alert_if = "RUNNING"
+		},
+		{
+			process = "iexplorer",
+      		alert_if = "NOT_RUNNING"
+      		email_notification = true
+		}
+	]
 }`
