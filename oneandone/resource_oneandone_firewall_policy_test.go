@@ -119,8 +119,8 @@ resource "oneandone_firewall_policy" "fw" {
   rules = [
     {
       "protocol" = "TCP"
-      "port_from" = 80
-      "port_to" = 80
+      "port" = "80"
+      "action" = "allow"
       "source_ip" = "0.0.0.0"
     },
     {
@@ -129,14 +129,14 @@ resource "oneandone_firewall_policy" "fw" {
     },
     {
       "protocol" = "TCP"
-      "port_from" = 43
-      "port_to" = 43
+      "port" = "43"
+      "action" = "allow"
       "source_ip" = "0.0.0.0"
     },
     {
       "protocol" = "TCP"
-      "port_from" = 22
-      "port_to" = 22
+      "port" = "22"
+      "action" = "allow"
       "source_ip" = "0.0.0.0"
     }
   ]
@@ -148,8 +148,8 @@ resource "oneandone_firewall_policy" "fw" {
   rules = [
     {
       "protocol" = "TCP"
-      "port_from" = 80
-      "port_to" = 80
+      "port" = "80"
+      "action" = "allow"
       "source_ip" = "0.0.0.0"
     },
     {
@@ -158,20 +158,20 @@ resource "oneandone_firewall_policy" "fw" {
     },
     {
       "protocol" = "TCP"
-      "port_from" = 43
-      "port_to" = 43
+      "port" = "43"
+      "action" = "allow"
       "source_ip" = "0.0.0.0"
     },
     {
       "protocol" = "TCP"
-      "port_from" = 22
-      "port_to" = 22
+      "port" = "22"
+      "action" = "allow"
       "source_ip" = "0.0.0.0"
     },
     {
       "protocol" = "TCP"
-      "port_from" = 88
-      "port_to" = 88
+      "port" = "88"
+      "action" = "allow"
       "source_ip" = "0.0.0.0"
     },
   ]

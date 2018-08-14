@@ -41,6 +41,18 @@ func resourceOneandOneFirewallPolicy() *schema.Resource {
 							Optional:     true,
 							ValidateFunc: validation.IntBetween(1, 65535),
 						},
+						"port": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"action": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"description": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
 						"source_ip": {
 							Type:     schema.TypeString,
 							Optional: true,
@@ -145,6 +157,18 @@ func resourceOneandOneFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 						rule.SourceIp = rl["source_ip"].(string)
 					}
 
+					if rl["port"] != nil {
+						rule.Port = rl["port"].(string)
+					}
+
+					if rl["action"] != nil {
+						rule.Action = rl["action"].(string)
+					}
+
+					if rl["description"] != nil {
+						rule.Description = rl["description"].(string)
+					}
+
 					rules = append(rules, rule)
 				}
 			}
@@ -235,6 +259,18 @@ func getRules(d *schema.ResourceData) []oneandone.FirewallPolicyRule {
 
 			if rl["source_ip"] != nil {
 				rule.SourceIp = rl["source_ip"].(string)
+			}
+
+			if rl["port"] != nil {
+				rule.Port = rl["port"].(string)
+			}
+
+			if rl["action"] != nil {
+				rule.Action = rl["action"].(string)
+			}
+
+			if rl["description"] != nil {
+				rule.Description = rl["description"].(string)
 			}
 
 			rules = append(rules, rule)
