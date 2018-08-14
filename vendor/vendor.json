@@ -676,5 +676,5 @@
 			"versionExact": "v1.6.1"
 		}
 	],
-	"rootPath": "github.com/stackpointcloud/terraform-provider-oneandone"
+	"rootPath": "github.com/1and1/terraform-provider-oneandone"
 }
