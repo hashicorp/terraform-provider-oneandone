@@ -1,4 +1,9 @@
 ## 1.2.1 (Unreleased)
+
+IMPROVEMENTS:
+
+* Firewall additions and improvements  [#20](https://github.com/terraform-providers/terraform-provider-oneandone/pull/20)
+
 ## 1.2.0 (July 24, 2018)
 
 IMPROVEMENTS: 
