@@ -133,7 +133,7 @@ func resourceOneandOneBaremetalServerCreate(d *schema.ResourceData, meta interfa
 			BaremetalModelId: baremetal_model_id,
 		}
 	} else {
-		return fmt.Errorf(fmt.Sprintf("must provide a valid baremetal model id %d", baremetal_model_id))
+		return fmt.Errorf(fmt.Sprintf("must provide a valid baremetal model id %v", baremetal_model_id))
 	}
 
 	if raw, ok := d.GetOk("ip"); ok {
