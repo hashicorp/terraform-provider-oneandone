@@ -13,6 +13,11 @@ import (
 )
 
 func TestAccOneandoneBaremetalServer_Hardware(t *testing.T) {
+	_, exists := os.LookupEnv("TF_ACC_BAREMETAL_LOCK")
+	if !exists {
+		t.Skip("`TF_ACC_BAREMETAL_LOCK` isn't specified - skipping since test will increase test time significantly")
+	}
+
 	var server oneandone.Server
 
 	name := "test_server_hardware"
@@ -28,10 +33,6 @@ func TestAccOneandoneBaremetalServer_Hardware(t *testing.T) {
 			resource.TestStep{
 				Config: fmt.Sprintf(testAccCheckOneandoneBaremetalServer_basic, name, name, image),
 				Check: resource.ComposeTestCheckFunc(
-					func(*terraform.State) error {
-						time.Sleep(10 * time.Second)
-						return nil
-					},
 					testAccCheckOneandoneBaremetalServerExists("oneandone_baremetal.server", &server),
 					resource.TestCheckResourceAttr("oneandone_baremetal.server", "name", name),
 				),
@@ -39,10 +40,6 @@ func TestAccOneandoneBaremetalServer_Hardware(t *testing.T) {
 			resource.TestStep{
 				Config: fmt.Sprintf(testAccCheckOneandoneBaremetalServer_hardware, name, name, image),
 				Check: resource.ComposeTestCheckFunc(
-					func(*terraform.State) error {
-						time.Sleep(10 * time.Second)
-						return nil
-					},
 					testAccCheckOneandoneBaremetalServerExists("oneandone_baremetal.server", &server),
 					resource.TestCheckResourceAttr("oneandone_baremetal.server", "name", name),
 				),
