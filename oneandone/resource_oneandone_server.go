@@ -251,8 +251,8 @@ func resourceOneandOneServerCreate(d *schema.ResourceData, meta interface{}) err
 		req.MonitoringPolicyId = mp_id.(string)
 	}
 
-	if mp_id, ok := d.GetOk("loadbalancer_id"); ok {
-		req.LoadBalancerId = mp_id.(string)
+	if lb_id, ok := d.GetOk("loadbalancer_id"); ok {
+		req.LoadBalancerId = lb_id.(string)
 	}
 
 	var privateKey string

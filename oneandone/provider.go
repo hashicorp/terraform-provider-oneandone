@@ -40,6 +40,7 @@ func Provider() terraform.ResourceProvider {
 			"oneandone_ssh_key":           resourceOneandOneSshKey(),
 			"oneandone_block_storage":     resourceOneandOneBlockStorage(),
 			"oneandone_image":             resourceOneandOneImage(),
+			"oneandone_baremetal":         resourceOneandOneBaremetalServer(),
 		},
 		ConfigureFunc: providerConfigure,
 		DataSourcesMap: map[string]*schema.Resource{
