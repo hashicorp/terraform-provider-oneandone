@@ -4,8 +4,6 @@ FEATURES:
 
 * **New Resource:** `oneandone_baremetal` [#21](https://github.com/terraform-providers/terraform-provider-oneandone/pull/21/)
 
-## 1.2.1 (Unreleased)
-
 IMPROVEMENTS:
 
 * Firewall additions and improvements  [#20](https://github.com/terraform-providers/terraform-provider-oneandone/pull/20)
