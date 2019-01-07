@@ -24,7 +24,7 @@ func TestAccOneandoneFirewall_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDOneandoneFirewallDestroyCheck,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneFirewall_basic, name),
 
 				Check: resource.ComposeTestCheckFunc(
@@ -37,7 +37,7 @@ func TestAccOneandoneFirewall_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("oneandone_firewall_policy.fw", "name", name),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneFirewall_update, name_updated),
 
 				Check: resource.ComposeTestCheckFunc(

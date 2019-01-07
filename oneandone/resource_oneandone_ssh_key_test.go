@@ -24,7 +24,7 @@ func TestAccOneandoneSshKey_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDOneandoneSshKeyDestroyCheck,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneSshKey_basic, name),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
@@ -36,7 +36,7 @@ func TestAccOneandoneSshKey_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("oneandone_ssh_key.ssh_key", "name", name),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneSshKey_update, name_updated),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {

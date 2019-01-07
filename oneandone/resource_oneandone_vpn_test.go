@@ -24,7 +24,7 @@ func TestAccOneandoneVpn_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDOneandoneVPNDestroyCheck,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneVPN_basic, name),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
@@ -36,7 +36,7 @@ func TestAccOneandoneVpn_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("oneandone_vpn.vpn", "name", name),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneVPN_basic, name_updated),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {

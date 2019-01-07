@@ -24,7 +24,7 @@ func TestAccOneandoneMonitoringPolicy_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDOneandoneMonitoringPolicyDestroyCheck,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneMonitoringPolicy_basic, name),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
@@ -36,7 +36,7 @@ func TestAccOneandoneMonitoringPolicy_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("oneandone_monitoring_policy.mp", "name", name),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneMonitoringPolicy_basic, name_updated),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {

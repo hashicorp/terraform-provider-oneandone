@@ -30,14 +30,14 @@ func TestAccOneandoneBaremetalServer_Hardware(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDOneandoneBaremetalServerDestroyCheck,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneBaremetalServer_basic, name, name, image),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckOneandoneBaremetalServerExists("oneandone_baremetal.server", &server),
 					resource.TestCheckResourceAttr("oneandone_baremetal.server", "name", name),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneBaremetalServer_hardware, name, name, image),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckOneandoneBaremetalServerExists("oneandone_baremetal.server", &server),

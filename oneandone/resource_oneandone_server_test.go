@@ -27,7 +27,7 @@ func TestAccOneandoneServer_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDOneandoneServerDestroyCheck,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneServer_basic, name, name, image),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
@@ -39,7 +39,7 @@ func TestAccOneandoneServer_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("oneandone_server.server", "name", name),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneServer_basic, name_updated, name_updated, updated_image),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
@@ -68,7 +68,7 @@ func TestAccOneandoneServer_Hardware(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDOneandoneServerDestroyCheck,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneServer_basic, name, name, image),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
@@ -81,7 +81,7 @@ func TestAccOneandoneServer_Hardware(t *testing.T) {
 					resource.TestCheckResourceAttr("oneandone_server.server", "name", name),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneServer_hardware, name, name, image),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
