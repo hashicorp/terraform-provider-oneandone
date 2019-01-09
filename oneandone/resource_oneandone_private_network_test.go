@@ -24,7 +24,7 @@ func TestAccOneandonePrivateNetwork_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckOneandonePrivateNetworkDestroyCheck,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandonePrivateNetwork_basic, name),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
@@ -36,7 +36,7 @@ func TestAccOneandonePrivateNetwork_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("oneandone_private_network.pn", "name", name),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandonePrivateNetwork_basic, name_updated),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {

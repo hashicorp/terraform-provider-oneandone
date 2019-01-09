@@ -24,7 +24,7 @@ func TestAccOneandoneLoadbalancer_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDOneandoneLoadbalancerDestroyCheck,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneLoadbalancer_basic, name),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
@@ -36,7 +36,7 @@ func TestAccOneandoneLoadbalancer_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("oneandone_loadbalancer.lb", "name", name),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneLoadbalancer_update, name_updated),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {

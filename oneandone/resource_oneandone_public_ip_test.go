@@ -24,7 +24,7 @@ func TestAccOneandonePublicIp_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDOneandonePublicIpDestroyCheck,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandonePublicIp_basic, reverse_dns),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
@@ -36,7 +36,7 @@ func TestAccOneandonePublicIp_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("oneandone_public_ip.ip", "reverse_dns", reverse_dns),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandonePublicIp_basic, reverse_dns_updated),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {

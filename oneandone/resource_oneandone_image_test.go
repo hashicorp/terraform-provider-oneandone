@@ -25,7 +25,7 @@ func TestAccOneandoneImage_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDOneandoneImageDestroyCheck,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneImage_basic, name),
 
 				Check: resource.ComposeTestCheckFunc(
@@ -38,7 +38,7 @@ func TestAccOneandoneImage_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("oneandone_image.img", "name", name),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneImage_basic, name_updated),
 
 				Check: resource.ComposeTestCheckFunc(

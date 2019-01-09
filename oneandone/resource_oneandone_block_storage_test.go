@@ -35,7 +35,7 @@ func TestAccOneandoneBlockStorage_Basic(t *testing.T) {
 			testAccCheckDOneandoneBlockStorageDestroyCheck,
 		),
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneBlockStorage_basic, server_name, name, image, name),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
@@ -47,7 +47,7 @@ func TestAccOneandoneBlockStorage_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("oneandone_block_storage.storage", "name", name),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneBlockStorage_basic, server_name, name, image, name_updated),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {

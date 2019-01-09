@@ -24,7 +24,7 @@ func TestAccOneandoneSharedStorage_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDOneandoneSharedStorageDestroyCheck,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneSharedStorage_basic, name),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
@@ -36,7 +36,7 @@ func TestAccOneandoneSharedStorage_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("oneandone_shared_storage.storage", "name", name),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccCheckOneandoneSharedStorage_basic, name_updated),
 				Check: resource.ComposeTestCheckFunc(
 					func(*terraform.State) error {
